@@ -23,10 +23,13 @@ bld/
 [Ll]og/
 [Ll]ogs/
 
+
 # .NET Core
 project.lock.json
 project.fragment.lock.json
 artifacts/
+appsettings.json
+appsettings.Development.json	
 
 # ASP.NET Scaffolding
 ScaffoldingReadMe.txt
@@ -40,6 +43,8 @@ ScaffoldingReadMe.txt
 ~$*
 *~
 CodeCoverage/
+.vs/
+
 
 # MSBuild Binary and Structured Log
 *.binlog

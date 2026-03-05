@@ -3,12 +3,12 @@
   "WorkspaceRootPath": "C:\\Users\\minkw\\source\\repos\\TaskSphere\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{23D98321-DFD0-490A-9861-12001C393196}|TS.Model\\TS.Model.csproj|c:\\users\\minkw\\source\\repos\\tasksphere\\ts.model\\data\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{23D98321-DFD0-490A-9861-12001C393196}|TS.Model\\TS.Model.csproj|solutionrelative:ts.model\\data\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{5F7A0754-6891-44A8-A3E6-7F999D6568E8}|TS.WebAPI\\TS.WebAPI.csproj|c:\\users\\minkw\\source\\repos\\tasksphere\\ts.webapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{5F7A0754-6891-44A8-A3E6-7F999D6568E8}|TS.WebAPI\\TS.WebAPI.csproj|solutionrelative:ts.webapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{23D98321-DFD0-490A-9861-12001C393196}|TS.Model\\TS.Model.csproj|c:\\users\\minkw\\source\\repos\\tasksphere\\ts.model\\data\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{23D98321-DFD0-490A-9861-12001C393196}|TS.Model\\TS.Model.csproj|solutionrelative:ts.model\\data\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -18,30 +18,34 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 2,
           "Children": [
             {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "AppDbContext.cs",
               "DocumentMoniker": "C:\\Users\\minkw\\source\\repos\\TaskSphere\\TS.Model\\Data\\AppDbContext.cs",
               "RelativeDocumentMoniker": "TS.Model\\Data\\AppDbContext.cs",
-              "ToolTip": "C:\\Users\\minkw\\source\\repos\\TaskSphere\\TS.Model\\Data\\AppDbContext.cs",
-              "RelativeToolTip": "TS.Model\\Data\\AppDbContext.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "ToolTip": "C:\\Users\\minkw\\source\\repos\\TaskSphere\\TS.Model\\Data\\AppDbContext.cs*",
+              "RelativeToolTip": "TS.Model\\Data\\AppDbContext.cs*",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-05T09:25:03.591Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\minkw\\source\\repos\\TaskSphere\\TS.WebAPI\\Program.cs",
               "RelativeDocumentMoniker": "TS.WebAPI\\Program.cs",
-              "ToolTip": "C:\\Users\\minkw\\source\\repos\\TaskSphere\\TS.WebAPI\\Program.cs",
-              "RelativeToolTip": "TS.WebAPI\\Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAAAAAAAAAAAA==",
+              "ToolTip": "C:\\Users\\minkw\\source\\repos\\TaskSphere\\TS.WebAPI\\Program.cs*",
+              "RelativeToolTip": "TS.WebAPI\\Program.cs*",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-05T08:30:46.353Z",
               "EditorCaption": ""
