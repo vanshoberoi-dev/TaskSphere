@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TS.Model.Enums
+﻿namespace TS.Model.Enums
 {
     public enum UserRole
     {
-        Admin = 1,
-        User = 2
+        Admin,
+        User
     }
 }

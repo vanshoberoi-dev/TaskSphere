@@ -1,12 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace TS.Contract.DTO
+namespace TS.Contract.DTOs
 {
-    internal class CommentResponse
+    public class CommentResponse
     {
+        public Guid Id { get; set; }
+
+        public string Message { get; set; }
+
+        public Guid TaskId { get; set; }
+
+        public Guid UserId { get; set; }
+
+        public DateTime CreatedAt { get; set; }
     }
 }
