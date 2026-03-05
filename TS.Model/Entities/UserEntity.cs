@@ -1,12 +1,11 @@
 ﻿using System;
+using TS.Model.Common;
 using TS.Model.Enums;
 
 namespace TS.Model.Domain
 {
-    public class UserEntity
+    public class UserEntity : BaseEntity
     {
-        public Guid Id { get; set; }
-
         public string Name { get; set; }
 
         public string Email { get; set; }
@@ -14,7 +13,5 @@ namespace TS.Model.Domain
         public string Password { get; set; }
 
         public UserRole Role { get; set; }
-
-        public DateTime CreatedAt { get; set; }
     }
 }

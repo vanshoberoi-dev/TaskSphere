@@ -4,7 +4,6 @@ namespace TS.Contract.DTOs
 {
     public class CommentResponse
     {
-        public Guid Id { get; set; }
 
         public string Message { get; set; }
 
