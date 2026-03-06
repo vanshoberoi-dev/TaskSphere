@@ -22,7 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TS.Contract\TS.Contract.csproj" />
     <ProjectReference Include="..\TS.Model\TS.Model.csproj" />
     <ProjectReference Include="..\TS.ServiceLogic\TS.ServiceLogic.csproj" />
   </ItemGroup>
