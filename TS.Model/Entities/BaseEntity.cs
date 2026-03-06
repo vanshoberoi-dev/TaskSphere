@@ -1,4 +1,4 @@
-﻿namespace TS.Model.Common
+﻿namespace TS.Model.Entities
 {
     public class BaseEntity
     {

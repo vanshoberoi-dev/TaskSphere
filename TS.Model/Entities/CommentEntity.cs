@@ -1,8 +1,6 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations.Schema;
-using TS.Model.Common;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace TS.Model.Domain
+namespace TS.Model.Entities
 {
     public class CommentEntity : BaseEntity
     {

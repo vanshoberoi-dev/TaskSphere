@@ -2,7 +2,7 @@
 
 namespace TS.Contract.DTOs
 {
-    public class CommentResponse
+    public class CommentResponseDTO
     {
 
         public string Message { get; set; }

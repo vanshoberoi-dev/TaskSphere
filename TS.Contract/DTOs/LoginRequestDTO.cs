@@ -1,6 +1,6 @@
 ﻿namespace TS.Contract.DTOs
 {
-    public class LoginRequest
+    public class LoginRequestDTO
     {
         public string Email { get; set; }
 

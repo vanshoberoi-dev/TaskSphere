@@ -15,4 +15,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TS.Contract\TS.Contract.csproj" />
+  </ItemGroup>
+
 </Project>

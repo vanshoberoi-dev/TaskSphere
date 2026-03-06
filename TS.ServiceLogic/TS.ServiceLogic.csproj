@@ -8,8 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Implementations\" />
-    <Folder Include="Interfaces\" />
     <Folder Include="Auth\" />
   </ItemGroup>
 
@@ -19,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TS.Contract\TS.Contract.csproj" />
+    <ProjectReference Include="..\TS.Model\TS.Model.csproj" />
   </ItemGroup>
 
 </Project>
