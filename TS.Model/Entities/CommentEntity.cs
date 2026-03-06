@@ -7,16 +7,15 @@ namespace TS.Model.Domain
     public class CommentEntity : BaseEntity
     {
         public string Message { get; set; }
-
-        [ForeignKey("Task")]
-        public Guid TaskId { get; set; }
-
-        [ForeignKey("User")]
-        public Guid UserId { get; set; }
+        public int TaskId { get; set; }
+        public int UserId { get; set; }
 
         // Navigation properties
+
+        [ForeignKey("TaskId")]
         public TaskEntity Task { get; set; }
 
+        [ForeignKey("UserId")]
         public UserEntity User { get; set; }
     }
 }
