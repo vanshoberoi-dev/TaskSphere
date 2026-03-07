@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TS.Model.Entities;
+using TS.Model.Entities.Auth;
 
 namespace TS.Model.Data
 {

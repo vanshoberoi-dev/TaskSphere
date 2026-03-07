@@ -1,10 +1,11 @@
-﻿using TS.Contract;
+﻿using TS.Contract.DTOs.Auth;
 
 namespace TS.ServiceLogic.Interfaces
 {
     public interface IAuthService
     {
-        Task<string> RegisterAsync(RegisterRequestDTO dto);
-        Task<RoleResponseDTO> CreateRoleAsync(CreateRoleRequestDTO dto);
+        Task<string> RegisterUserAsync(RegisterUserRequestDTO request);
+        Task<CreateRoleResponseDTO> CreateRoleAsync(CreateRoleRequestDTO request);
+        Task<string> LoginUserAsync(LoginUserRequestDTO request);
     }
 }

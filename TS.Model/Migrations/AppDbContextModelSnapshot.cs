@@ -22,7 +22,7 @@ namespace TS.Model.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("TS.Model.Domain.CommentEntity", b =>
+            modelBuilder.Entity("TS.Model.Entities.CommentEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -35,7 +35,8 @@ namespace TS.Model.Migrations
 
                     b.Property<string>("Message")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
 
                     b.Property<int>("TaskId")
                         .HasColumnType("int");
@@ -52,7 +53,27 @@ namespace TS.Model.Migrations
                     b.ToTable("Comments");
                 });
 
-            modelBuilder.Entity("TS.Model.Domain.TaskEntity", b =>
+            modelBuilder.Entity("TS.Model.Entities.RoleEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Roles");
+                });
+
+            modelBuilder.Entity("TS.Model.Entities.TaskEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -64,7 +85,6 @@ namespace TS.Model.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Status")
@@ -84,7 +104,7 @@ namespace TS.Model.Migrations
                     b.ToTable("Tasks");
                 });
 
-            modelBuilder.Entity("TS.Model.Domain.UserEntity", b =>
+            modelBuilder.Entity("TS.Model.Entities.UserEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -97,33 +117,37 @@ namespace TS.Model.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Password")
+                    b.Property<string>("PasswordHash")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
-                    b.Property<int>("Role")
+                    b.Property<int>("RoleId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("RoleId");
+
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("TS.Model.Domain.CommentEntity", b =>
+            modelBuilder.Entity("TS.Model.Entities.CommentEntity", b =>
                 {
-                    b.HasOne("TS.Model.Domain.TaskEntity", "Task")
+                    b.HasOne("TS.Model.Entities.TaskEntity", "Task")
                         .WithMany()
                         .HasForeignKey("TaskId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TS.Model.Domain.UserEntity", "User")
+                    b.HasOne("TS.Model.Entities.UserEntity", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -134,15 +158,26 @@ namespace TS.Model.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TS.Model.Domain.TaskEntity", b =>
+            modelBuilder.Entity("TS.Model.Entities.TaskEntity", b =>
                 {
-                    b.HasOne("TS.Model.Domain.UserEntity", "User")
+                    b.HasOne("TS.Model.Entities.UserEntity", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TS.Model.Entities.UserEntity", b =>
+                {
+                    b.HasOne("TS.Model.Entities.RoleEntity", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
                 });
 #pragma warning restore 612, 618
         }

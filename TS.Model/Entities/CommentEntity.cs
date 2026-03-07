@@ -1,19 +1,26 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using TS.Model.Entities.Auth;
 
 namespace TS.Model.Entities
 {
     public class CommentEntity : BaseEntity
     {
-        public string Message { get; set; }
+        [Required, StringLength(2000)]
+        public string Message { get; set; } = string.Empty; // Fixed CS8618 warning
+
+        [Required]
         public int TaskId { get; set; }
+
+        [Required]
         public int UserId { get; set; }
 
-        // Navigation properties
-
+        // --- Navigation properties ---
+        
         [ForeignKey("TaskId")]
-        public TaskEntity Task { get; set; }
+        public virtual TaskEntity Task { get; set; } = null!;
 
         [ForeignKey("UserId")]
-        public UserEntity User { get; set; }
+        public virtual UserEntity User { get; set; } = null!;
     }
 }

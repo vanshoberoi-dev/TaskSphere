@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using TS.Contract;
+using TS.Contract.DTOs.Auth;
 using TS.ServiceLogic.Interfaces;
 
 namespace TS.WebAPI.Controllers
@@ -15,18 +15,47 @@ namespace TS.WebAPI.Controllers
             _authService = authService;
         }
 
-        [HttpPost("register")]
-        public async Task<IActionResult> Register(RegisterRequestDTO dto)
+        [HttpPost("create-role")]
+        public async Task<IActionResult> CreateRole(CreateRoleRequestDTO request)
         {
-            var result = await _authService.RegisterAsync(dto);
-            return Ok(result);
+            try
+            {
+                var result = await _authService.CreateRoleAsync(request);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
         }
 
-        [HttpPost("create-role")]
-        public async Task<IActionResult> CreateRole(CreateRoleRequestDTO dto)
+
+        [HttpPost("register-user")]
+        public async Task<IActionResult> RegisterUser(RegisterUserRequestDTO request)
         {
-            var result = await _authService.CreateRoleAsync(dto);
-            return Ok(result);
+            try {
+                var result = await _authService.RegisterUserAsync(request);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            
         }
+
+        [HttpPost("login-user")]
+        public async Task<IActionResult> LoginUser(LoginUserRequestDTO request)
+        {
+            try {
+                return Ok(await _authService.LoginUserAsync(request));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        
     }
 }
