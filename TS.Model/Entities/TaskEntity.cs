@@ -1,19 +1,23 @@
-﻿using System;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using TS.Model.Common;
-using TS.Model.Enums;
+using TS.Model.Entities.Auth;
 
-namespace TS.Model.Domain
+namespace TS.Model.Entities
 {
     public class TaskEntity : BaseEntity
     {
+        [Required]
         public string Title { get; set; }
-        public string Description { get; set; }
-        public TS.Model.Enums.TaskStatus Status { get; set; }
-        public int UserId { get; set; }
-        // Navigation Property
 
+        public string? Description { get; set; }
+
+        public TS.Contract.Enums.TaskStatus Status { get; set; } = TS.Contract.Enums.TaskStatus.Pending;  
+
+        [Required]
+        public int UserId { get; set; }
+
+        // Navigation Property
         [ForeignKey("UserId")]
-        public UserEntity User { get; set; }
+        public virtual UserEntity User { get; set; }
     }
 }

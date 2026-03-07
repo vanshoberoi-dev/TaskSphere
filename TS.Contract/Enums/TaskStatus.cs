@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace TS.Model.Enums
+﻿namespace TS.Contract.Enums
 {
     public enum TaskStatus
     {
