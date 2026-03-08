@@ -1,23 +1,36 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using TS.Contract.Enums;
+using TS.Model.Entities;
 using TS.Model.Entities.Auth;
 
-namespace TS.Model.Entities
+public class TaskEntity : BaseEntity
 {
-    public class TaskEntity : BaseEntity
-    {
-        [Required]
-        public string Title { get; set; }
 
-        public string? Description { get; set; }
+    [Required]
+    [MaxLength(100)]
+    public required string Title { get; set; }
 
-        public TS.Contract.Enums.TaskStatus Status { get; set; } = TS.Contract.Enums.TaskStatus.Pending;  
+    [MaxLength(500)]
+    public string? Description { get; set; }
 
-        [Required]
-        public int UserId { get; set; }
+    [Required]
+    public TS.Contract.Enums.TaskStatus Status { get; set; }
 
-        // Navigation Property
-        [ForeignKey("UserId")]
-        public virtual UserEntity User { get; set; }
-    }
+    [Required]
+    public required DateTime DueDate { get; set; }
+
+    [Required]
+    public required string CreatedByAdminEmail { get; set; }
+
+    public string? AssignedToUserEmail { get; set; }
+
+    // Navigation property
+
+    [ForeignKey("AssignedToUserId")]
+    public virtual UserEntity Assignee{ get; set; }
+
+
+    [ForeignKey("CreatedByAdminId")]
+    public virtual UserEntity Admin { get; set; }
 }
