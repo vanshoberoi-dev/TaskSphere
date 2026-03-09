@@ -8,6 +8,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using TS.Contract.DTOs.Auth;
+using TS.Contract.DTOs.Task;
 using TS.Model.Data;
 using TS.Model.Entities;
 using TS.Model.Entities.Auth;
@@ -78,8 +79,7 @@ namespace TS.ServiceLogic.Implementations
 
             return new CreateRoleResponseDTO
             {
-                Id = role.Id,
-                RoleName = role.Role
+                Message = $"Role {role.Role} Successfully created with id {role.Id}"
             };
         }
 

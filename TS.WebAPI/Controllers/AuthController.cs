@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TS.Contract.DTOs.Auth;
+using TS.Contract.DTOs.Task;
 using TS.ServiceLogic.Interfaces;
 
 namespace TS.WebAPI.Controllers

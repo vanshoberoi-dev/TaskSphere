@@ -1,11 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using TS.Contract.Enums;
-using TS.Model.Entities;
-using TS.Model.Entities.Auth;
 
-public class TaskEntity : BaseEntity
+public class GetTaskResponseDTO
 {
+    [Required]
+    public required int TaskId { get; set; }
 
     [Required]
     [MaxLength(100)]
@@ -20,15 +18,11 @@ public class TaskEntity : BaseEntity
     [Required]
     public required DateTime DueDate { get; set; }
 
-    public string? Remarks { get; set; }= string.Empty;
+    public string? Remarks { get; set; } = string.Empty;
 
     [Required]
     public required int CreatedByAdminId { get; set; }
 
-    
-
-    // Navigation property
-
-    [ForeignKey("CreatedByAdminId")]
-    public virtual UserEntity Admin { get; set; }
+    [Required]
+    public required DateTime CreatedOn { get; set; }
 }

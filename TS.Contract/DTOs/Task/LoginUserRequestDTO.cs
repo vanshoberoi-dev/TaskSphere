@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace TS.Contract.DTOs.Auth
+namespace TS.Contract.DTOs.Task
 {
     public class LoginUserRequestDTO
     {
