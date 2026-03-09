@@ -15,21 +15,19 @@ public class TaskEntity : BaseEntity
     public string? Description { get; set; }
 
     [Required]
-    public TS.Contract.Enums.TaskStatus Status { get; set; }
+    public TS.Contract.Enums.TaskStatus Status { get; set; } = TS.Contract.Enums.TaskStatus.Pending;
 
     [Required]
     public required DateTime DueDate { get; set; }
 
-    [Required]
-    public required string CreatedByAdminEmail { get; set; }
+    public string? Remarks { get; set; }= string.Empty;
 
-    public string? AssignedToUserEmail { get; set; }
+    [Required]
+    public required int CreatedByAdminId { get; set; }
+
+    
 
     // Navigation property
-
-    [ForeignKey("AssignedToUserId")]
-    public virtual UserEntity Assignee{ get; set; }
-
 
     [ForeignKey("CreatedByAdminId")]
     public virtual UserEntity Admin { get; set; }

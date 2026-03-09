@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
 using System.Security.Claims;
 using TS.Contract.DTOs;
 using TS.Model.Data;
@@ -19,36 +20,38 @@ public class TaskService : ITaskService
 
     public async Task<CreateTaskResponseDTO> CreateTaskAsync(CreateTaskRequestDTO request)
     {
-        var user = _httpContextAccessor.HttpContext.User;
+        var user = _httpContextAccessor.HttpContext?.User;
 
-        var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier).Value;
+        if (user == null || !user.Identity.IsAuthenticated)
+            throw new UnauthorizedAccessException("User not authenticated.");
 
-        int userId = int.Parse(userIdClaim);
+        var userIdClaim = user?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var userRoleClaim = user.FindFirst(ClaimTypes.Role)?.Value;
 
-        if (userId != 1)
+        if (userRoleClaim != "Admin")
+            throw new UnauthorizedAccessException("Only admins can create tasks.");
+
+        if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int adminId))
         {
-            throw new UnauthorizedAccessException("User is not authorized");
+            throw new UnauthorizedAccessException("Invalid user identity.");
         }
-
-        var userEmailClaim = user.FindFirst(ClaimTypes.Email).Value;
 
         var task = new TaskEntity
         {
             Title = request.Title,
             Description = request.Description,
             Status = request.Status,
-            DueDate = request.DueDate,
-            CreatedByAdminEmail = userEmailClaim
+            DueDate = DateTime.UtcNow.AddDays(request.DueInDays),
+            CreatedByAdminId = adminId
         };
 
         await _context.Tasks.AddAsync(task);
         await _context.SaveChangesAsync();
 
-        var response = new CreateTaskResponseDTO
+        return new CreateTaskResponseDTO
         {
             message = $"Task {task.Title} with id {task.Id} created successfully"
         };
-
-        return response;
     }
+
 }

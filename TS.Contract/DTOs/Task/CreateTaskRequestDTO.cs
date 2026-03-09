@@ -14,8 +14,8 @@ public class CreateTaskRequestDTO
     public TS.Contract.Enums.TaskStatus Status { get; set; } = TS.Contract.Enums.TaskStatus.Pending;
 
     [Required]
-    public required DateTime DueDate { get; set; }
+    public required int DueInDays { get; set; }
 
-    public string? AssignedToUserEmail { get; set; }
-    
+    public string? Remarks { get; set; } = string.Empty;
+
 }
