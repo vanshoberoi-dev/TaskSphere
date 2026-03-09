@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Remove="DTOs\Task\GetTaskByIDResponseDTO" />
+    <None Remove="DTOs\Task\NewFile1.txt" />
+  </ItemGroup>
+
 </Project>
