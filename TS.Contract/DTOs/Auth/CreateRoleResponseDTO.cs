@@ -2,7 +2,8 @@
 {
     public class CreateRoleResponseDTO
     {
-        public required int Id { get; set; }
-        public required string RoleName { get; set; }
+        public int Id { get; set; }
+        public string RoleName { get; set; }
+        public string Message { get; set; }
     }
 }

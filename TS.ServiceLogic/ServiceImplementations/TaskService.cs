@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualBasic;
 using System.Security.Claims;
 using TS.Contract.DTOs;
+using TS.Contract.DTOs.Task;
 using TS.Model.Data;
 using TS.Model.Entities;
 using TS.ServiceLogic.Interfaces;
@@ -18,6 +18,41 @@ public class TaskService : ITaskService
         _context = context;
     }
 
+
+    //DELETE TASK   
+    public async Task<bool> DeleteTaskAsync(DeleteTaskRequestDTO request)
+    {
+        var task = await _context.Tasks
+            .FirstOrDefaultAsync(t => t.Id == request.TaskId);
+
+        if (task == null)
+            return false;
+
+        _context.Tasks.Remove(task);
+
+        await _context.SaveChangesAsync();
+
+        return true;
+    }
+
+
+
+    // UPDATE TASK STATUS
+    public async Task<bool> UpdateTaskStatusAsync(UpdateTaskStatusRequestDTO request)
+    {
+        var task = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == request.TaskId);
+
+        if (task == null)
+            return false;
+
+        task.Status = request.TaskStatus;
+
+        await _context.SaveChangesAsync();
+
+        return true;
+    }
+
+    // CREATE TASK
     public async Task<CreateTaskResponseDTO> CreateTaskAsync(CreateTaskRequestDTO request)
     {
         var user = _httpContextAccessor.HttpContext?.User;
@@ -53,5 +88,4 @@ public class TaskService : ITaskService
             message = $"Task {task.Title} with id {task.Id} created successfully"
         };
     }
-
 }

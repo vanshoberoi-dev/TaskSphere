@@ -78,8 +78,7 @@ namespace TS.ServiceLogic.Implementations
 
             return new CreateRoleResponseDTO
             {
-                Id = role.Id,
-                RoleName = role.Role
+                Message = $"Role {role.Role} Successfully created with id {role.Id}"
             };
         }
 
