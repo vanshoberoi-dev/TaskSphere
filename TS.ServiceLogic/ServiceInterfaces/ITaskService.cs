@@ -1,12 +1,12 @@
-﻿using TS.Contract.DTOs.Task;
+﻿using ServiceLogic.DTOs.Task;
+using TS.Contract.DTOs.Task;
 
 public interface ITaskService
 {
     Task<CreateTaskResponseDTO> CreateTaskAsync(CreateTaskRequestDTO request);
+    Task<CreateTaskResponseDTO> GetTaskDetailsAsync(int Id);
     //Task<CreateTaskResponseDTO> AssignTaskAsync(AssignTaskRequestDTO request);
-    //Task<IEnumerable<CreateTaskResponseDTO>> GetAllTasksAsync();
-    //Task<CreateTaskResponseDTO?> GetTaskByIdAsync(int taskId);
-    Task<bool> UpdateTaskStatusAsync(UpdateTaskStatusRequestDTO request);
-    Task<bool> DeleteTaskAsync(DeleteTaskRequestDTO request);
-
+    Task<string> ChangeTaskStatusAsync(ChangeTaskStatusRequestDTO request);
+    Task<string> DeleteTaskAsync(DeleteTaskRequestDTO request);
+    Task<string> UpdateTaskAsync(UpdateTaskRequestDTO request);
 }

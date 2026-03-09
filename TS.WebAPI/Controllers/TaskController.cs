@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ServiceLogic.DTOs.Task;
 using System.Security.Claims;
 using TS.Contract.DTOs.Task;
 
@@ -18,52 +19,78 @@ public class TaskController : ControllerBase
 
     [Authorize]
     [HttpPost("create-task")]
-    public async Task<IActionResult> CreateTask([FromBody] CreateTaskRequestDTO request)
+    public async Task<IActionResult> CreateTask(CreateTaskRequestDTO request)
     {
         var result = await _taskService.CreateTaskAsync(request);
         return Ok(result);
     }
 
     [Authorize]
-    [HttpPatch("update-task-status")]
-    public async Task<IActionResult> UpdateTaskStatus([FromBody] UpdateTaskStatusRequestDTO request)
+    [HttpGet("get-task/{id}")]
+    public async Task<IActionResult> GetTaskDetails(int id)
     {
-        var result = await _taskService.UpdateTaskStatusAsync(request);
+        try
+        {
+            return Ok(await _taskService.GetTaskDetailsAsync(id));
+        }
+        catch (Exception ex) {
+            return BadRequest($"Error Occured : {ex.Message}");
+        }
+    }
 
-        if (!result)
-            return NotFound("Task not found");
+    [Authorize]
+    [HttpPatch("change-task-status")]
+    public async Task<IActionResult> ChangeTaskStatus(ChangeTaskStatusRequestDTO request)
+    {
+        var result = await _taskService.ChangeTaskStatusAsync(request);
+
+        if (result == "Task not found")
+            return NotFound(result);
 
         return Ok(result);
     }
     [Authorize]
     [HttpDelete("delete-task")]
-    public async Task<IActionResult> DeleteTask([FromBody] DeleteTaskRequestDTO request)
+    public async Task<IActionResult> DeleteTask(DeleteTaskRequestDTO request)
     {
         var result = await _taskService.DeleteTaskAsync(request);
 
-        if (!result)
-            return NotFound("Task not found");
+        if (result == "Task not found")
+            return NotFound("result");
 
         return Ok("Task deleted successfully");
     }
 
+        [Authorize]
+        [HttpPut("update-task")]
+        public async Task<IActionResult> UpdateTask(UpdateTaskRequestDTO request)
+        {
+            var result = await _taskService.UpdateTaskAsync(request);
+
+            if (result == "Task not found")
+                return NotFound(result);
+
+            return Ok(result);
+        }
 
 
 
-    //[HttpPost("assign-task")]
-    //public async Task<IActionResult> AssignTask([FromBody] AssignTaskRequestDTO dto)
-    //{
-    //    if (!ModelState.IsValid)
-    //        return BadRequest(ModelState);
 
-    //    var result = await _taskService.AssignTaskAsync(dto);
-    //    return Ok(result);
-    //}
 
-    //[HttpGet("get-tasks")]
-    //public async Task<IActionResult> GetAllTasks()
-    //{
-    //    var tasks = await _taskService.GetAllTasksAsync();
-    //    return Ok(tasks);
-    //}
-}
+        //[HttpPost("assign-task")]
+        //public async Task<IActionResult> AssignTask([FromBody] AssignTaskRequestDTO dto)
+        //{
+        //    if (!ModelState.IsValid)
+        //        return BadRequest(ModelState);
+
+        //    var result = await _taskService.AssignTaskAsync(dto);
+        //    return Ok(result);
+        //}
+
+        //[HttpGet("get-tasks")]
+        //public async Task<IActionResult> GetAllTasks()
+        //{
+        //    var tasks = await _taskService.GetAllTasksAsync();
+        //    return Ok(tasks);
+        //}
+    }

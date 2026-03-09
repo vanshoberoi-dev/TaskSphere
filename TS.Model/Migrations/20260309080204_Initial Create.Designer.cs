@@ -12,7 +12,7 @@ using TS.Model.Data;
 namespace TS.Model.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260309061233_InitialCreate")]
+    [Migration("20260309080204_Initial Create")]
     partial class InitialCreate
     {
         /// <inheritdoc />
