@@ -1,4 +1,6 @@
-﻿namespace ServiceLogic.DTOs.Task
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ServiceLogic.DTOs.Task
 {
     public class UpdateTaskRequestDTO
     {

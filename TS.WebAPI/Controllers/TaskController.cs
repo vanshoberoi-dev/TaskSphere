@@ -6,7 +6,6 @@ using TS.Contract.DTOs.Task;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = "Admin")]   
 public class TaskController : ControllerBase
 {
     private readonly ITaskService _taskService;
@@ -25,13 +24,22 @@ public class TaskController : ControllerBase
         return Ok(result);
     }
 
-    [Authorize]
+    
+    [HttpGet("get-all-tasks")]
+    public async Task<IActionResult> GetTasks() {
+        try {
+            return Ok(await _taskService.GetTasksAsync());
+        }
+        catch(Exception ex) { return BadRequest($"Error Occured : {ex.Message}"); }
+    }
+
+    
     [HttpGet("get-task/{id}")]
-    public async Task<IActionResult> GetTaskDetails(int id)
+    public async Task<IActionResult> GetTaskByID(int id)
     {
         try
         {
-            return Ok(await _taskService.GetTaskDetailsAsync(id));
+            return Ok(await _taskService.GetTaskByIDAsync(id));
         }
         catch (Exception ex) {
             return BadRequest($"Error Occured : {ex.Message}");
