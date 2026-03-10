@@ -116,6 +116,9 @@ namespace TS.Model.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("AssigneeId")
+                        .HasColumnType("int");
+
                     b.Property<int>("CreatedByAdminId")
                         .HasColumnType("int");
 
@@ -141,6 +144,8 @@ namespace TS.Model.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AssigneeId");
 
                     b.HasIndex("CreatedByAdminId");
 
@@ -179,6 +184,10 @@ namespace TS.Model.Migrations
 
             modelBuilder.Entity("TaskEntity", b =>
                 {
+                    b.HasOne("TS.Model.Entities.Auth.UserEntity", "Assignee")
+                        .WithMany()
+                        .HasForeignKey("AssigneeId");
+
                     b.HasOne("TS.Model.Entities.Auth.UserEntity", "Admin")
                         .WithMany()
                         .HasForeignKey("CreatedByAdminId")
@@ -186,6 +195,8 @@ namespace TS.Model.Migrations
                         .IsRequired();
 
                     b.Navigation("Admin");
+
+                    b.Navigation("Assignee");
                 });
 #pragma warning restore 612, 618
         }

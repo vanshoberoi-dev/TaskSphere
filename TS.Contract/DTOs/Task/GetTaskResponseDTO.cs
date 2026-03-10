@@ -12,6 +12,8 @@ public class GetTaskResponseDTO
     [MaxLength(500)]
     public string? Description { get; set; }
 
+    public string? AssigneeEmail { get; set; }
+
     [Required]
     public TS.Contract.Enums.TaskStatus Status { get; set; } = TS.Contract.Enums.TaskStatus.Pending;
 
