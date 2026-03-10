@@ -1,6 +1,6 @@
 ﻿using TS.Contract.DTOs.Auth;
 
-namespace TS.ServiceLogic.Interfaces
+namespace TS.ServiceLogic.ServiceInterfaces
 {
     public interface IAuthService
     {

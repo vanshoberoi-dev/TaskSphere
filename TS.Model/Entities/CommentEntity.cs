@@ -6,14 +6,15 @@ namespace TS.Model.Entities
 {
     public class CommentEntity : BaseEntity
     {
-        [Required, StringLength(2000)]
-        public string Message { get; set; } = string.Empty; // Fixed CS8618 warning
-
-        [Required]
-        public int TaskId { get; set; }
-
         [Required]
         public int UserId { get; set; }
+
+        [Required]
+        public required int TaskId { get; set; }
+
+        [Required, StringLength(2000)]
+        public string Comment { get; set; } = string.Empty;
+
 
         // --- Navigation properties ---
         
@@ -21,6 +22,6 @@ namespace TS.Model.Entities
         public virtual TaskEntity Task { get; set; } = null!;
 
         [ForeignKey("UserId")]
-        public virtual UserEntity User { get; set; } = null!;
+        public virtual UserEntity Commenter { get; set; } = null!;
     }
 }

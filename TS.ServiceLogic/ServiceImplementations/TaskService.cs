@@ -1,12 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using ServiceLogic.DTOs.Task;
 using System.Security.Claims;
-using TS.Contract.DTOs;
 using TS.Contract.DTOs.Task;
 using TS.Model.Data;
+using TS.ServiceLogic.ServiceInterfaces;
 
-namespace TS.ServiceLogic.Implementations
+namespace TS.ServiceLogic.ServiceImplementations
 {
     public class TaskService : ITaskService
     {
