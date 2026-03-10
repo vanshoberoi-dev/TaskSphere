@@ -1,6 +1,4 @@
-﻿using Azure.Core;
-using Isopoh.Cryptography.Argon2;
-using Microsoft.AspNetCore.Mvc;
+﻿using Isopoh.Cryptography.Argon2;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -9,11 +7,10 @@ using System.Security.Claims;
 using System.Text;
 using TS.Contract.DTOs.Auth;
 using TS.Model.Data;
-using TS.Model.Entities;
 using TS.Model.Entities.Auth;
-using TS.ServiceLogic.Interfaces;
+using TS.ServiceLogic.ServiceInterfaces;
 
-namespace TS.ServiceLogic.Implementations
+namespace TS.ServiceLogic.ServiceImplementations
 {
     public class AuthService : IAuthService
     {

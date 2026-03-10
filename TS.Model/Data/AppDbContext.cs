@@ -21,7 +21,7 @@ namespace TS.Model.Data
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<CommentEntity>()
-                .HasOne(c => c.User)
+                .HasOne(c => c.Commenter)
                 .WithMany()
                 .HasForeignKey(c => c.UserId)
                 .OnDelete(DeleteBehavior.Restrict);

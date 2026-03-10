@@ -3,8 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using TS.Model.Data;
-using TS.ServiceLogic.Implementations;
-using TS.ServiceLogic.Interfaces;
+using TS.ServiceLogic.ServiceImplementations;
+using TS.ServiceLogic.ServiceInterfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -69,6 +69,7 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
+builder.Services.AddScoped<ICommentService, CommentService>();
 
 // Configured Db Context
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("TSConnectionString")));

@@ -6,14 +6,18 @@ namespace TS.Contract.DTOs.Comment
     public class CommentResponseDTO
     {
         [Required]
-        public required string Message { get; set; }
+        public required int CommentID { get; set; }
 
         [Required]
-        public required int TaskId { get; set; }
+        public required string CommenterEmail { get; set; }
 
         [Required]
-        public required int UserId { get; set; }
+        public required string TaskTitle { get; set; }
 
-        public DateTime CreatedAt { get; set; }
+        [Required]
+        public required string Comment { get; set; }
+
+        [Required]
+        public required DateTime CreatedOn { get; set; }
     }
 }
