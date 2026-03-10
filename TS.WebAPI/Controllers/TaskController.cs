@@ -4,70 +4,99 @@ using ServiceLogic.DTOs.Task;
 using System.Security.Claims;
 using TS.Contract.DTOs.Task;
 
-[ApiController]
-[Route("api/[controller]")]
-public class TaskController : ControllerBase
+namespace TS.WebAPI.Controllers
 {
-    private readonly ITaskService _taskService;
-
-    public TaskController(ITaskService taskService)
+    [ApiController]
+    [Route("api/[controller]")]
+    public class TaskController : ControllerBase
     {
-        _taskService = taskService;
-    }
+        private readonly ITaskService _taskService;
 
-
-    [Authorize]
-    [HttpPost("create-task")]
-    public async Task<IActionResult> CreateTask(CreateTaskRequestDTO request)
-    {
-        var result = await _taskService.CreateTaskAsync(request);
-        return Ok(result);
-    }
-
-    
-    [HttpGet("get-all-tasks")]
-    public async Task<IActionResult> GetTasks() {
-        try {
-            return Ok(await _taskService.GetTasksAsync());
-        }
-        catch(Exception ex) { return BadRequest($"Error Occured : {ex.Message}"); }
-    }
-
-    
-    [HttpGet("get-task/{id}")]
-    public async Task<IActionResult> GetTaskByID(int id)
-    {
-        try
+        public TaskController(ITaskService taskService)
         {
-            return Ok(await _taskService.GetTaskByIDAsync(id));
+            _taskService = taskService;
         }
-        catch (Exception ex) {
-            return BadRequest($"Error Occured : {ex.Message}");
+
+
+        [Authorize]
+        [HttpPost("create-task")]
+        public async Task<IActionResult> CreateTask(CreateTaskRequestDTO request)
+        {
+            try
+            {
+                var result = await _taskService.CreateTaskAsync(request);
+                return Ok(result);
+            }
+
+            catch (Exception ex) {
+                return BadRequest($"Error Occurred : {ex.Message}");
+            }
         }
-    }
 
-    [Authorize]
-    [HttpPatch("change-task-status")]
-    public async Task<IActionResult> ChangeTaskStatus(ChangeTaskStatusRequestDTO request)
-    {
-        var result = await _taskService.ChangeTaskStatusAsync(request);
+        [HttpPost("assign-task")]
+        public async Task<IActionResult> AssignTask(AssignTaskRequestDTO request)
+        {
+            try
+            {
+                var result = await _taskService.AssignTaskAsync(request);
+                return Ok(result);
+            }
+            catch (Exception ex) {
+                return BadRequest($"Error occured : {ex.Message}");
+            }
 
-        if (result == "Task not found")
-            return NotFound(result);
+        }
 
-        return Ok(result);
-    }
-    [Authorize]
-    [HttpDelete("delete-task")]
-    public async Task<IActionResult> DeleteTask(DeleteTaskRequestDTO request)
-    {
-        var result = await _taskService.DeleteTaskAsync(request);
 
-        if (result == "Task not found")
-            return NotFound("result");
+        [HttpGet("get-all-tasks")]
+        public async Task<IActionResult> GetTasks() {
+            try {
+                return Ok(await _taskService.GetTasksAsync());
+            }
+            catch (Exception ex) { return BadRequest($"Error Occured : {ex.Message}"); }
+        }
 
-        return Ok("Task deleted successfully");
-    }
+
+        [HttpGet("get-task/{id}")]
+        public async Task<IActionResult> GetTaskByID(int id)
+        {
+            try
+            {
+                return Ok(await _taskService.GetTaskByIDAsync(id));
+            }
+            catch (Exception ex) {
+                return BadRequest($"Error Occured : {ex.Message}");
+            }
+        }
+
+        [Authorize]
+        [HttpPatch("change-task-status")]
+        public async Task<IActionResult> ChangeTaskStatus(ChangeTaskStatusRequestDTO request)
+        {
+            try
+            {
+                var result = await _taskService.ChangeTaskStatusAsync(request);
+                return Ok(result);
+            }
+            catch (Exception ex) {
+                return BadRequest($"Error occured : {ex.Message}");
+            }
+
+
+
+        }
+        [Authorize]
+        [HttpDelete("delete-task")]
+        public async Task<IActionResult> DeleteTask(DeleteTaskRequestDTO request)
+        {
+            try {
+                var result = await _taskService.DeleteTaskAsync(request);
+                return Ok("Task deleted successfully");
+            }
+            catch (Exception ex) {
+                return BadRequest($"Error Occured : {ex.Message}");
+            }
+        }
 
         [Authorize]
         [HttpPut("update-task")]
@@ -81,24 +110,5 @@ public class TaskController : ControllerBase
             return Ok(result);
         }
 
-
-
-
-
-        //[HttpPost("assign-task")]
-        //public async Task<IActionResult> AssignTask([FromBody] AssignTaskRequestDTO dto)
-        //{
-        //    if (!ModelState.IsValid)
-        //        return BadRequest(ModelState);
-
-        //    var result = await _taskService.AssignTaskAsync(dto);
-        //    return Ok(result);
-        //}
-
-        //[HttpGet("get-tasks")]
-        //public async Task<IActionResult> GetAllTasks()
-        //{
-        //    var tasks = await _taskService.GetAllTasksAsync();
-        //    return Ok(tasks);
-        //}
     }
+}

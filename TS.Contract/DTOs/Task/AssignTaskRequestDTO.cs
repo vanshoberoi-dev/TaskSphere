@@ -6,5 +6,5 @@ public class AssignTaskRequestDTO
     public required int TaskId { get; set; }
 
     [Required]
-    public required int AssigneeEmail { get; set; }
+    public required string AssigneeEmail { get; set; }
 }

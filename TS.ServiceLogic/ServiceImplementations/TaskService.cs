@@ -1,187 +1,220 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualBasic;
 using ServiceLogic.DTOs.Task;
 using System.Security.Claims;
 using TS.Contract.DTOs;
 using TS.Contract.DTOs.Task;
 using TS.Model.Data;
-using TS.Model.Entities;
-using TS.ServiceLogic.Interfaces;
 
-public class TaskService : ITaskService
+namespace TS.ServiceLogic.Implementations
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly AppDbContext _context;
-
-    public TaskService(IHttpContextAccessor httpContextAccessor, AppDbContext context)
+    public class TaskService : ITaskService
     {
-        _httpContextAccessor = httpContextAccessor;
-        _context = context;
-    }
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly AppDbContext _context;
 
-    public async Task<string> DeleteTaskAsync(DeleteTaskRequestDTO request)
-    {
-        var user = _httpContextAccessor.HttpContext?.User;
-        if (user == null || !user.Identity.IsAuthenticated)
-            throw new UnauthorizedAccessException("User not authenticated.");
-
-        var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        var userRoleClaim = user.FindFirst(ClaimTypes.Role)?.Value;
-
-        if (userRoleClaim != "Admin")
-            throw new UnauthorizedAccessException("Only admins can delete tasks.");
-
-        if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int adminId))
-            throw new UnauthorizedAccessException("Invalid user identity.");
-
-        var task = await _context.Tasks
-            .FirstOrDefaultAsync(t => t.Id == request.TaskId);
-
-        if (task == null)
-            return "Task not found";
-
-        _context.Tasks.Remove(task);
-
-        await _context.SaveChangesAsync();
-
-        return $"Task {task.Id} Deleted Successfully";
-    }
-
-    public async Task<string> ChangeTaskStatusAsync(ChangeTaskStatusRequestDTO request)
-    {
-        var user = _httpContextAccessor.HttpContext?.User;
-        if (user == null || !user.Identity.IsAuthenticated)
-            throw new UnauthorizedAccessException("User not authenticated.");
-
-        var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        var userRoleClaim = user.FindFirst(ClaimTypes.Role)?.Value;
-
-        if (userRoleClaim != "Admin")
-            throw new UnauthorizedAccessException("Only admins can change task status.");
-
-        if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int adminId))
-            throw new UnauthorizedAccessException("Invalid user identity.");
-
-        var task = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == request.TaskId);
-
-        if (task == null)
-            return "Task not found";
-
-        task.Status = request.TaskStatus;
-
-        await _context.SaveChangesAsync();
-
-        return $"Task Status Updated to {task.Status}";
-    }
-
-
-    public async Task<string> UpdateTaskAsync(UpdateTaskRequestDTO request)
-    {
-        var user = _httpContextAccessor.HttpContext?.User;
-        if (user == null || !user.Identity.IsAuthenticated)
-            throw new UnauthorizedAccessException("User not authenticated.");
-
-      
-        var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        var userRoleClaim = user.FindFirst(ClaimTypes.Role)?.Value;
-
-        
-        if (userRoleClaim != "Admin")
-            throw new UnauthorizedAccessException("Only admins can update tasks.");
-
-        
-        if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int adminId))
-            throw new UnauthorizedAccessException("Invalid user identity.");
-        var task = await _context.Tasks
-            .FirstOrDefaultAsync(t => t.Id == request.TaskId);
-
-        if (task == null)
-            return "Task not found";
-
-        task.Title = request.Title;
-        task.Description = request.Description;
-        task.Status = request.Status;
-        task.DueDate = DateTime.UtcNow.AddDays(request.DueInDays);
-
-        await _context.SaveChangesAsync();
-
-        return $"Task {task.Id} Updated Successfully";
-    }
-
-    public async Task<CreateTaskResponseDTO> CreateTaskAsync(CreateTaskRequestDTO request)
-    {
-        var user = _httpContextAccessor.HttpContext?.User;
-
-        if (user == null || !user.Identity.IsAuthenticated)
-            throw new UnauthorizedAccessException("User not authenticated.");
-
-        var userIdClaim = user?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        var userRoleClaim = user.FindFirst(ClaimTypes.Role)?.Value;
-
-        if (userRoleClaim != "Admin")
-            throw new UnauthorizedAccessException("Only admins can create tasks.");
-
-        if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int adminId))
+        public TaskService(IHttpContextAccessor httpContextAccessor, AppDbContext context)
         {
-            throw new UnauthorizedAccessException("Invalid user identity.");
+            _httpContextAccessor = httpContextAccessor;
+            _context = context;
         }
 
-        var task = new TaskEntity
+        public async Task<CreateTaskResponseDTO> CreateTaskAsync(CreateTaskRequestDTO request)
         {
-            Title = request.Title,
-            Description = request.Description,
-            Status = request.Status,
-            DueDate = DateTime.UtcNow.AddDays(request.DueInDays),
-            CreatedByAdminId = adminId
-        };
+            var user = _httpContextAccessor.HttpContext?.User;
 
-        await _context.Tasks.AddAsync(task);
-        await _context.SaveChangesAsync();
+            if (user == null || !user.Identity.IsAuthenticated)
+                throw new UnauthorizedAccessException("User not authenticated.");
 
-        return new CreateTaskResponseDTO
+            var userIdClaim = user?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userRoleClaim = user.FindFirst(ClaimTypes.Role)?.Value;
+
+            if (userRoleClaim != "Admin")
+                throw new UnauthorizedAccessException("Only admins can create tasks.");
+
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int adminId))
+            {
+                throw new UnauthorizedAccessException("Invalid user identity.");
+            }
+
+            var task = new TaskEntity
+            {
+                Title = request.Title,
+                Description = request.Description,
+                Status = request.Status,
+                DueDate = DateTime.UtcNow.AddDays(request.DueInDays),
+                CreatedByAdminId = adminId
+            };
+
+            await _context.Tasks.AddAsync(task);
+            await _context.SaveChangesAsync();
+
+            return new CreateTaskResponseDTO
+            {
+                message = $"Task {task.Title} with id {task.Id} created successfully"
+            };
+        }
+
+        public async Task<string> AssignTaskAsync(AssignTaskRequestDTO request)
         {
-            message = $"Task {task.Title} with id {task.Id} created successfully"
-        };
-    }
+            var user = _httpContextAccessor.HttpContext?.User;
+            if (user == null || !user.Identity.IsAuthenticated)
+                throw new UnauthorizedAccessException("User not authenticated.");
+            var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userRoleClaim = user.FindFirst(ClaimTypes.Role)?.Value;
+            if (userRoleClaim != "Admin")
+                throw new UnauthorizedAccessException("Only admins can assign tasks.");
 
-    // Check
+            var task = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == request.TaskId);
+            if (task == null)
+                return "Task not found";
+            var assignee = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.AssigneeEmail);
+            if (assignee == null)
+                return "Assignee not found";
 
-    public async Task<IEnumerable<GetTaskResponseDTO>> GetTasksAsync()
-    {
-        var tasks = await _context.Tasks.ToListAsync();
+            task.AssigneeId = assignee.Id;
 
-        return tasks.Select(t => new GetTaskResponseDTO
+            await _context.SaveChangesAsync();
+            return $"Task '{task.Title}' with ID '{task.Id}' assigned to User with email '{assignee.Email}' successfully";
+
+        }
+
+
+
+        public async Task<string> ChangeTaskStatusAsync(ChangeTaskStatusRequestDTO request)
         {
-            TaskId = t.Id,
-            Title = t.Title,
-            Description = t.Description,
-            Status = t.Status,
-            DueDate = t.DueDate,
-            Remarks = t.Remarks,
-            CreatedByAdminId = t.CreatedByAdminId,
-            CreatedOn = t.CreatedOn
-        });
-    }
+            var user = _httpContextAccessor.HttpContext?.User;
+            if (user == null || !user.Identity.IsAuthenticated)
+                throw new UnauthorizedAccessException("User not authenticated.");
 
-    public async Task<GetTaskResponseDTO>  GetTaskByIDAsync(int taskId)
-    {
-        var task = await _context.Tasks
-            .FirstOrDefaultAsync(t => t.Id == taskId);
-        if (task == null)
-            throw new KeyNotFoundException($"Task with ID {taskId} was not found.");
+            var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userRoleClaim = user.FindFirst(ClaimTypes.Role)?.Value;
 
-        var response = new GetTaskResponseDTO
+            if (userRoleClaim != "Admin")
+                throw new UnauthorizedAccessException("Only admins can change task status.");
+
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out _))
+                throw new UnauthorizedAccessException("Invalid user identity.");
+
+            var task = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == request.TaskId);
+
+            if (task == null)
+                throw new KeyNotFoundException($"Task with ID {request.TaskId} was not found.");
+
+            task.Status = request.TaskStatus;
+
+            await _context.SaveChangesAsync();
+
+            return $"Task Status Updated to {task.Status}";
+        }
+
+        public async Task<IEnumerable<GetTaskResponseDTO>> GetTasksAsync()
         {
-            TaskId = taskId,
-            Title = task.Title,
-            Description = task.Description,
-            Status = task.Status,
-            DueDate = task.DueDate,
-            CreatedByAdminId = task.CreatedByAdminId,
-            CreatedOn = task.CreatedOn
-        };
+            var tasks = await _context.Tasks
+                .AsNoTracking()
+                .Select(t => new GetTaskResponseDTO
+                {
+                    TaskId = t.Id,
+                    Title = t.Title,
+                    Description = t.Description,
+                    AssigneeEmail = t.Assignee != null ? t.Assignee.Email : null,
+                    Status = t.Status,
+                    DueDate = t.DueDate,
+                    Remarks = t.Remarks,
+                    CreatedByAdminId = t.CreatedByAdminId,
+                    CreatedOn = t.CreatedOn
+                })
+                .ToListAsync();
 
-        return response;
+            return tasks;
+        }
+
+        public async Task<GetTaskResponseDTO> GetTaskByIDAsync(int taskId)
+        {
+            var response = await _context.Tasks
+                .AsNoTracking()
+                .Where(t => t.Id == taskId)
+                .Select(t => new GetTaskResponseDTO
+                {
+                    TaskId = t.Id,
+                    Title = t.Title,
+                    Description = t.Description,
+                    AssigneeEmail = t.Assignee != null ? t.Assignee.Email : null,
+                    Status = t.Status,
+                    DueDate = t.DueDate,
+                    CreatedByAdminId = t.CreatedByAdminId,
+                    CreatedOn = t.CreatedOn
+                })
+                .FirstOrDefaultAsync();
+
+            if (response == null)
+                throw new KeyNotFoundException($"Task with ID {taskId} was not found.");
+
+            return response;
+        }
+
+
+        public async Task<string> DeleteTaskAsync(DeleteTaskRequestDTO request)
+        {
+            var user = _httpContextAccessor.HttpContext?.User;
+            if (user == null || !user.Identity.IsAuthenticated)
+                throw new UnauthorizedAccessException("User not authenticated.");
+
+            var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userRoleClaim = user.FindFirst(ClaimTypes.Role)?.Value;
+
+            if (userRoleClaim != "Admin")
+                throw new UnauthorizedAccessException("Only admins can delete tasks.");
+
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out _))
+                throw new UnauthorizedAccessException("Invalid user identity.");
+
+            var task = await _context.Tasks
+                .FirstOrDefaultAsync(t => t.Id == request.TaskId);
+
+            if (task == null)
+                throw new KeyNotFoundException($"Task with ID {request.TaskId} was not found.");
+
+            _context.Tasks.Remove(task);
+
+            await _context.SaveChangesAsync();
+
+            return $"Task {task.Id} Deleted Successfully";
+        }
+
+
+        public async Task<string> UpdateTaskAsync(UpdateTaskRequestDTO request)
+        {
+            var user = _httpContextAccessor.HttpContext?.User;
+            if (user == null || !user.Identity.IsAuthenticated)
+                throw new UnauthorizedAccessException("User not authenticated.");
+
+
+            var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userRoleClaim = user.FindFirst(ClaimTypes.Role)?.Value;
+
+
+            if (userRoleClaim != "Admin")
+                throw new UnauthorizedAccessException("Only admins can update tasks.");
+
+
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out _))
+                throw new UnauthorizedAccessException("Invalid user identity.");
+            var task = await _context.Tasks
+                .FirstOrDefaultAsync(t => t.Id == request.TaskId);
+
+            if (task == null)
+                throw new KeyNotFoundException($"Task with ID {request.TaskId} was not found.");
+
+            task.Title = request.Title;
+            task.Description = request.Description;
+            task.Status = request.Status;
+            task.DueDate = DateTime.UtcNow.AddDays(request.DueInDays);
+
+            await _context.SaveChangesAsync();
+
+            return $"Task {task.Id} Updated Successfully";
+        }
+
     }
 }
