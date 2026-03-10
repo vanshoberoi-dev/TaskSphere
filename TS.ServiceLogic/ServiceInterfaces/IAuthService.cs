@@ -1,5 +1,4 @@
 ﻿using TS.Contract.DTOs.Auth;
-using TS.Contract.DTOs.Task;
 
 namespace TS.ServiceLogic.Interfaces
 {
