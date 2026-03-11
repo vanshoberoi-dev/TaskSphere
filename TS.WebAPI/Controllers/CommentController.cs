@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using TS.ServiceLogic.ServiceInterfaces;
+using TS.ServiceLogic.Interfaces;
 using TS.Contract.DTOs.Comment;
 using Microsoft.AspNetCore.Authorization;
 
