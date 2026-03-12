@@ -25,7 +25,7 @@ namespace TS.WebAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(ex.InnerException);
             }
 
         }
@@ -40,7 +40,7 @@ namespace TS.WebAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(ex.InnerException);
             }
             
         }
@@ -53,7 +53,7 @@ namespace TS.WebAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(ex.InnerException);
             }
         }
         

@@ -25,7 +25,7 @@ namespace TS.WebAPI.Controllers
                 return Ok(await _commentService.AddCommentAsync(request));
             }
             catch(Exception ex) {
-                return BadRequest($"Error occured : {ex.Message}");
+                return BadRequest($"Error occured : {ex.InnerException}");
             }
         }
 
@@ -38,7 +38,7 @@ namespace TS.WebAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest($"Error occured : {ex.Message}");
+                return BadRequest($"Error occured : {ex.InnerException}");
             }
         }
 
@@ -53,7 +53,7 @@ namespace TS.WebAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest($"Error occurred: {ex.Message}");
+                return BadRequest($"Error occurred: {ex.InnerException}");
             }
         }
     }
