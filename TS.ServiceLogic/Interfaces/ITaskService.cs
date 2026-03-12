@@ -1,6 +1,6 @@
 ﻿using TS.Contract.DTOs.Task;
 
-namespace TS.ServiceLogic.ServiceInterfaces
+namespace TS.ServiceLogic.Interfaces
 {
     public interface ITaskService
     {
