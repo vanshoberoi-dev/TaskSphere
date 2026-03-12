@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TS.Contract.DTOs.Task;
-using TS.ServiceLogic.ServiceInterfaces;
+using TS.ServiceLogic.Interfaces;
 
 namespace TS.WebAPI.Controllers
 {
@@ -28,7 +28,7 @@ namespace TS.WebAPI.Controllers
             }
 
             catch (Exception ex) {
-                return BadRequest($"Error Occurred : {ex.Message}");
+                return BadRequest($"Error Occurred : {ex.InnerException}");
             }
         }
 
@@ -41,7 +41,7 @@ namespace TS.WebAPI.Controllers
                 return Ok(result);
             }
             catch (Exception ex) {
-                return BadRequest($"Error occured : {ex.Message}");
+                return BadRequest($"Error occured : {ex.InnerException}");
             }
 
         }
@@ -52,7 +52,7 @@ namespace TS.WebAPI.Controllers
             try {
                 return Ok(await _taskService.GetTasksAsync());
             }
-            catch (Exception ex) { return BadRequest($"Error Occured : {ex.Message}"); }
+            catch (Exception ex) { return BadRequest($"Error Occured : {ex.InnerException}"); }
         }
 
 
@@ -64,7 +64,7 @@ namespace TS.WebAPI.Controllers
                 return Ok(await _taskService.GetTaskByIDAsync(id));
             }
             catch (Exception ex) {
-                return BadRequest($"Error Occured : {ex.Message}");
+                return BadRequest($"Error Occured : {ex.InnerException}");
             }
         }
 
@@ -78,7 +78,7 @@ namespace TS.WebAPI.Controllers
                 return Ok(result);
             }
             catch (Exception ex) {
-                return BadRequest($"Error occured : {ex.Message}");
+                return BadRequest($"Error occured : {ex.InnerException}");
             }
 
 
@@ -93,7 +93,7 @@ namespace TS.WebAPI.Controllers
                 return Ok("Task deleted successfully");
             }
             catch (Exception ex) {
-                return BadRequest($"Error Occured : {ex.Message}");
+                return BadRequest($"Error Occured : {ex.InnerException}");
             }
         }
 
@@ -101,12 +101,14 @@ namespace TS.WebAPI.Controllers
         [HttpPut("update-task")]
         public async Task<IActionResult> UpdateTask(UpdateTaskRequestDTO request)
         {
-            var result = await _taskService.UpdateTaskAsync(request);
-
-            if (result == "Task not found")
-                return NotFound(result);
-
-            return Ok(result);
+            try
+            {
+                var result = await _taskService.UpdateTaskAsync(request);
+                return Ok(result);
+            }
+            catch (Exception ex) { 
+                    return BadRequest($"Error Occured : {ex.InnerException}");
+            }
         }
 
     }

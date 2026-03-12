@@ -8,9 +8,9 @@ using System.Text;
 using TS.Contract.DTOs.Auth;
 using TS.Model.Data;
 using TS.Model.Entities.Auth;
-using TS.ServiceLogic.ServiceInterfaces;
+using TS.ServiceLogic.Interfaces;
 
-namespace TS.ServiceLogic.ServiceImplementations
+namespace TS.ServiceLogic.Services
 {
     public class AuthService : IAuthService
     {

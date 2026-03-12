@@ -3,8 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using TS.Model.Data;
-using TS.ServiceLogic.ServiceImplementations;
-using TS.ServiceLogic.ServiceInterfaces;
+using TS.ServiceLogic.Services;
+using TS.ServiceLogic.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
