@@ -7,4 +7,6 @@ public class AssignTaskRequestDTO
 
     [Required]
     public required string AssigneeEmail { get; set; }
+
+    public bool ForcedAssign { get; set; }
 }

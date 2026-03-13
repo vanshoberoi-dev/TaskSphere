@@ -25,7 +25,8 @@ namespace TS.WebAPI.Controllers
                 return Ok(await _commentService.AddCommentAsync(request));
             }
             catch(Exception ex) {
-                return BadRequest($"Error occured : {ex.InnerException}");
+                var message = ex.InnerException?.Message ?? ex.Message;
+                return BadRequest(new { error = message });
             }
         }
 
@@ -38,12 +39,13 @@ namespace TS.WebAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest($"Error occured : {ex.InnerException}");
+                var message = ex.InnerException?.Message ?? ex.Message;
+                return BadRequest(new { error = message });
             }
         }
 
         [Authorize]
-        [HttpDelete("delete-comment/{commentId}")]
+        [HttpPut("delete-comment/{commentId}")]
         public async Task<IActionResult> DeleteComment(int commentId)
         {
             try
@@ -53,7 +55,8 @@ namespace TS.WebAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest($"Error occurred: {ex.InnerException}");
+                var message = ex.InnerException?.Message ?? ex.Message;
+                return BadRequest(new { error = message });
             }
         }
     }

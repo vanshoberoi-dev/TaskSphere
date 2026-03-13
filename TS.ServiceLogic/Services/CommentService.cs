@@ -84,7 +84,7 @@ namespace TS.ServiceLogic.Services
                 throw new UnauthorizedAccessException("You do not have permission to delete this comment.");
             }
 
-            _context.Comments.Remove(comment);
+            comment.IsDeleted = true;
             await _context.SaveChangesAsync();
 
             return "Comment deleted successfully.";

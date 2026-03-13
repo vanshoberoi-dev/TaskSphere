@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TS.Contract.DTOs.Auth;
 using TS.ServiceLogic.Interfaces;
 
@@ -25,7 +26,8 @@ namespace TS.WebAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.InnerException);
+                var message = ex.InnerException?.Message ?? ex.Message;
+                return BadRequest(new { error = message });
             }
 
         }
@@ -34,28 +36,47 @@ namespace TS.WebAPI.Controllers
         [HttpPost("register-user")]
         public async Task<IActionResult> RegisterUser(RegisterUserRequestDTO request)
         {
-            try {
+            try
+            {
                 var result = await _authService.RegisterUserAsync(request);
                 return Ok(result);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.InnerException);
+                var message = ex.InnerException?.Message ?? ex.Message;
+                return BadRequest(new { error = message });
             }
-            
+
         }
 
         [HttpPost("login-user")]
         public async Task<IActionResult> LoginUser(LoginUserRequestDTO request)
         {
-            try {
+            try
+            {
                 return Ok(await _authService.LoginUserAsync(request));
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.InnerException);
+                var message = ex.InnerException?.Message ?? ex.Message;
+                return BadRequest(new { error = message });
             }
         }
-        
+
+        [Authorize]
+        [HttpPut("delete-user")]
+        public async Task<IActionResult> DeleteUser(DeleteUserRequestDTO request)
+        {
+            try
+            {
+                var result = await _authService.DeleteUserAsync(request);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                var message = ex.InnerException?.Message ?? ex.Message;
+                return BadRequest(new { error = message });
+            }
+        }
     }
 }

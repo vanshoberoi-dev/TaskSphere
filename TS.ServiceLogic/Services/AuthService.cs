@@ -1,4 +1,5 @@
 ﻿using Isopoh.Cryptography.Argon2;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -8,6 +9,7 @@ using System.Text;
 using TS.Contract.DTOs.Auth;
 using TS.Model.Data;
 using TS.Model.Entities.Auth;
+using TS.ServiceLogic.Common;
 using TS.ServiceLogic.Interfaces;
 
 namespace TS.ServiceLogic.Services
@@ -17,15 +19,15 @@ namespace TS.ServiceLogic.Services
 
         private readonly AppDbContext _context;
         private readonly IConfiguration _configuration;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        // Constructor
-        public AuthService(AppDbContext context, IConfiguration configuration)
+        public AuthService(AppDbContext context, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             _configuration = configuration;
+            _httpContextAccessor = httpContextAccessor;
         }
 
-        // Function Definitions
 
         public async Task<string> LoginUserAsync(LoginUserRequestDTO request)
         {
@@ -82,38 +84,53 @@ namespace TS.ServiceLogic.Services
 
         public async Task<string> RegisterUserAsync(RegisterUserRequestDTO request)
         {
-            
-            RoleEntity role = null;
-            if (request.RoleId > 0)
+            if (await _context.Users.AnyAsync(u => u.Email == request.Email))
             {
-                role = await _context.Roles.FindAsync(request.RoleId);
+                throw new InvalidOperationException("A user with this Email already exists.");
             }
 
-            if (role == null)
-            {
-                role = await _context.Roles.FirstOrDefaultAsync(r => r.Role == "User");
-                if (role == null)
-                {
-                    role = new RoleEntity { Id = 2 , Role = "User" };
-                    await _context.Roles.AddAsync(role);
-                    await _context.SaveChangesAsync();
-                }
-            }
-
-            var user = new UserEntity()
+            var user = new UserEntity
             {
                 Name = request.Name,
                 Email = request.Email,
                 PasswordHash = Argon2.Hash(request.Password),
-                RoleId = role.Id
+                RoleId = request.RoleId > 0 ? request.RoleId : 2,
+                CreatedOn = DateTime.UtcNow
             };
 
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
 
-            return $"User Registered Successfully with user id {user.Id}";
+            return $"User Registered Successfully with ID {user.Id}";
         }
 
-        
+        public async Task<string> DeleteUserAsync(DeleteUserRequestDTO request)
+        {
+          
+            TS.ServiceLogic.Common.Utility.ValidateAdminAndGetId(_httpContextAccessor.HttpContext?.User);
+
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Email == request.Email);
+
+            if (user == null)
+                throw new KeyNotFoundException("User not found");
+
+            if (user.IsDeleted)
+                throw new InvalidOperationException("User is already deleted.");
+
+            var activeTasks = await _context.Tasks.AnyAsync(t =>
+                t.AssigneeId == user.Id &&
+                t.Status != TS.Contract.Enums.TaskStatus.Completed);
+
+            if (activeTasks)
+                throw new InvalidOperationException(
+                    "User cannot be deleted because they still have active tasks.");
+
+            user.IsDeleted = true;
+
+            await _context.SaveChangesAsync();
+
+            return $"User '{user.Email}' deleted successfully.";
+        }
     }
 }

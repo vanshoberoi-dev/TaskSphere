@@ -39,23 +39,40 @@ namespace TS.ServiceLogic.Services
                 message = $"Task {task.Title} with id {task.Id} created successfully"
             };
         }
+        
 
         public async Task<string> AssignTaskAsync(AssignTaskRequestDTO request)
         {
             Utility.ValidateAdminAndGetId(_httpContextAccessor.HttpContext?.User);
 
             var task = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == request.TaskId);
-            if (task == null)
-                return "Task not found";
 
-            var assignee = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.AssigneeEmail);
+            if (task == null)
+                throw new KeyNotFoundException($"Task with ID {request.TaskId} not found.");
+
+            var assignee = await _context.Users
+                .FirstOrDefaultAsync(u => u.Email == request.AssigneeEmail);
+
             if (assignee == null)
-                return "Assignee not found";
+                throw new KeyNotFoundException($"User with email {request.AssigneeEmail} not found.");
+
+            if (task.AssigneeId != null && !request.ForcedAssign)
+                throw new InvalidOperationException(
+                    $"Task is already assigned. Use ForcedAssign to reassign."
+                );
+
+            var previousAssigneeId = task.AssigneeId;
 
             task.AssigneeId = assignee.Id;
 
             await _context.SaveChangesAsync();
-            return $"Task '{task.Title}' with ID '{task.Id}' assigned to User with email '{assignee.Email}' successfully";
+
+            if (previousAssigneeId != null && request.ForcedAssign)
+            {
+                return $"Task '{task.Title}' (ID: {task.Id}) reassigned to '{assignee.Email}' successfully.";
+            }
+
+            return $"Task '{task.Title}' (ID: {task.Id}) assigned to '{assignee.Email}' successfully.";
         }
 
         public async Task<string> ChangeTaskStatusAsync(ChangeTaskStatusRequestDTO request)
@@ -128,7 +145,12 @@ namespace TS.ServiceLogic.Services
             if (task == null)
                 throw new KeyNotFoundException($"Task with ID {request.TaskId} was not found.");
 
-            _context.Tasks.Remove(task);
+            if ((task.Status == TS.Contract.Enums.TaskStatus.InProgress || task.Status == TS.Contract.Enums.TaskStatus.Completed) && !request.ForceDelete)
+            {
+                throw new InvalidOperationException("InProgress or Completed tasks cannot be deleted without ForceDelete.");
+            }
+
+            task.IsDeleted = true;
             await _context.SaveChangesAsync();
 
             return $"Task {task.Id} Deleted Successfully";
