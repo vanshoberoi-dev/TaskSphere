@@ -20,10 +20,25 @@ namespace TS.Model.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<UserEntity>()
+                .HasQueryFilter(u => !u.IsDeleted);
+
+            modelBuilder.Entity<TaskEntity>()
+                .HasQueryFilter(t => !t.IsDeleted);
+
+            modelBuilder.Entity<CommentEntity>()
+                .HasQueryFilter(c => !c.IsDeleted);
+
             modelBuilder.Entity<CommentEntity>()
                 .HasOne(c => c.Commenter)
-                .WithMany()
+                .WithMany() 
                 .HasForeignKey(c => c.UserId)
+                .OnDelete(DeleteBehavior.Restrict); 
+
+            modelBuilder.Entity<TaskEntity>()
+                .HasOne(t => t.Assignee)
+                .WithMany()
+                .HasForeignKey(t => t.AssigneeId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

@@ -1,4 +1,10 @@
-﻿public class CreateTaskResponseDTO
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace TS.Contract.DTOs.Task
 {
-    public string message { get; set; }
+    public class CreateTaskResponseDTO
+    {
+        [Required]
+        public required string message { get; set; }
+    }
 }

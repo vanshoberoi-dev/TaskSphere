@@ -1,11 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
 using TS.Contract.DTOs.Comment;
 using TS.Model.Data;
 using TS.Model.Entities;
-using TS.ServiceLogic.Interfaces;
 using TS.ServiceLogic.Common;
+using TS.ServiceLogic.Interfaces;
 
 namespace TS.ServiceLogic.Services
 {
@@ -25,7 +24,7 @@ namespace TS.ServiceLogic.Services
             var taskExists = await _context.Tasks.AnyAsync(t => t.Id == request.TaskId);
             if (!taskExists)
             {
-                throw new KeyNotFoundException($"Task with ID {request.TaskId} not found.");
+                return $"Task with ID {request.TaskId} not found.";
             }
 
             int userId = Utility.ValidateUserAndGetId(_httpContextAccessor.HttpContext?.User);
@@ -73,18 +72,18 @@ namespace TS.ServiceLogic.Services
             int currentUserId = Utility.ValidateUserAndGetId(_httpContextAccessor.HttpContext?.User);
 
             var comment = await _context.Comments.FirstOrDefaultAsync(c => c.Id == commentId);
-
+            
             if (comment == null)
             {
-                throw new KeyNotFoundException($"Comment with ID {commentId} not found.");
+                return $"Comment with ID {commentId} not found.";
             }
 
             if (comment.UserId != currentUserId)
             {
-                throw new UnauthorizedAccessException("You do not have permission to delete this comment.");
+                return "You do not have permission to delete this comment.";
             }
 
-            _context.Comments.Remove(comment);
+            comment.IsDeleted = true;
             await _context.SaveChangesAsync();
 
             return "Comment deleted successfully.";

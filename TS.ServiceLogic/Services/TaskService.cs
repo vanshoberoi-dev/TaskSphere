@@ -20,7 +20,7 @@ namespace TS.ServiceLogic.Services
 
         public async Task<CreateTaskResponseDTO> CreateTaskAsync(CreateTaskRequestDTO request)
         {
-            int adminId = Utility.ValidateAdminAndGetId(_httpContextAccessor.HttpContext?.User);
+            int userId = Utility.ValidateUserAndGetId(_httpContextAccessor.HttpContext?.User);
 
             var task = new TaskEntity
             {
@@ -28,7 +28,7 @@ namespace TS.ServiceLogic.Services
                 Description = request.Description,
                 Status = request.Status,
                 DueDate = DateTime.UtcNow.AddDays(request.DueInDays),
-                CreatedByAdminId = adminId
+                CreatedById = userId
             };
 
             await _context.Tasks.AddAsync(task);
@@ -39,33 +39,53 @@ namespace TS.ServiceLogic.Services
                 message = $"Task {task.Title} with id {task.Id} created successfully"
             };
         }
+        
 
         public async Task<string> AssignTaskAsync(AssignTaskRequestDTO request)
         {
             Utility.ValidateAdminAndGetId(_httpContextAccessor.HttpContext?.User);
 
             var task = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == request.TaskId);
-            if (task == null)
-                return "Task not found";
 
-            var assignee = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.AssigneeEmail);
+            if (task == null)
+                return $"Task with ID {request.TaskId} not found.";
+
+            var assignee = await _context.Users
+                .FirstOrDefaultAsync(u => u.Email == request.AssigneeEmail);
+
             if (assignee == null)
-                return "Assignee not found";
+                return $"User with email {request.AssigneeEmail} not found.";
+
+            if (task.AssigneeId != null && !request.ForcedAssign)
+                return $"Task is already assigned. Use ForcedAssign to reassign.";
+
+            var previousAssigneeId = task.AssigneeId;
 
             task.AssigneeId = assignee.Id;
 
             await _context.SaveChangesAsync();
-            return $"Task '{task.Title}' with ID '{task.Id}' assigned to User with email '{assignee.Email}' successfully";
+
+            if (previousAssigneeId != null && request.ForcedAssign)
+            {
+                return $"Task '{task.Title}' (ID: {task.Id}) reassigned to '{assignee.Email}' successfully.";
+            }
+
+            return $"Task '{task.Title}' (ID: {task.Id}) assigned to '{assignee.Email}' successfully.";
         }
 
         public async Task<string> ChangeTaskStatusAsync(ChangeTaskStatusRequestDTO request)
         {
-            Utility.ValidateAdminAndGetId(_httpContextAccessor.HttpContext?.User);
+            var userId = Utility.ValidateUserAndGetId(_httpContextAccessor.HttpContext?.User);
 
             var task = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == request.TaskId);
 
             if (task == null)
-                throw new KeyNotFoundException($"Task with ID {request.TaskId} was not found.");
+                return $"Task with ID {request.TaskId} was not found.";
+
+            if (userId != task.CreatedById)
+            {
+                return $"Only the creator of the task can change its status. Task created by user ID {task.CreatedById}.";
+            }
 
             task.Status = request.TaskStatus;
 
@@ -87,7 +107,7 @@ namespace TS.ServiceLogic.Services
                     Status = t.Status,
                     DueDate = t.DueDate,
                     Remarks = t.Remarks,
-                    CreatedByAdminId = t.CreatedByAdminId,
+                    CreatedById = t.CreatedById,
                     CreatedOn = t.CreatedOn
                 })
                 .ToListAsync();
@@ -108,7 +128,7 @@ namespace TS.ServiceLogic.Services
                     AssigneeEmail = t.Assignee != null ? t.Assignee.Email : null,
                     Status = t.Status,
                     DueDate = t.DueDate,
-                    CreatedByAdminId = t.CreatedByAdminId,
+                    CreatedById = t.CreatedById,
                     CreatedOn = t.CreatedOn
                 })
                 .FirstOrDefaultAsync();
@@ -126,9 +146,14 @@ namespace TS.ServiceLogic.Services
             var task = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == request.TaskId);
 
             if (task == null)
-                throw new KeyNotFoundException($"Task with ID {request.TaskId} was not found.");
+                return $"Task with ID {request.TaskId} was not found.";
 
-            _context.Tasks.Remove(task);
+            if ((task.Status == TS.Contract.Enums.TaskStatus.InProgress || task.Status == TS.Contract.Enums.TaskStatus.Completed) && !request.ForceDelete)
+            {
+                return "InProgress or Completed tasks cannot be deleted without ForceDelete.";
+            }
+
+            task.IsDeleted = true;
             await _context.SaveChangesAsync();
 
             return $"Task {task.Id} Deleted Successfully";
@@ -141,7 +166,7 @@ namespace TS.ServiceLogic.Services
             var task = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == request.TaskId);
 
             if (task == null)
-                throw new KeyNotFoundException($"Task with ID {request.TaskId} was not found.");
+                return $"Task with ID {request.TaskId} was not found.";
 
             task.Title = request.Title;
             task.Description = request.Description;
