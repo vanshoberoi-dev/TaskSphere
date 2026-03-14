@@ -15,26 +15,27 @@ TaskSphere is a lightweight, team-focused ticket manager built on .NET 8.
 2. `dotnet run` (from project folder)
 3. Open http://localhost:5000
 
-
 ### Project Structure
 
 TaskSphere.sln
-├── TS.Contract
+│
+├── TS.Contract/
 │   ├── DTOs (Auth, Comment, Task)
 │   ├── Enums
 │   └── TS.Contract.csproj
-├── TS.Model
+│
+├── TS.Model/
 │   ├── Data (AppDbContext.cs)
 │   ├── Entities (Auth, Base, Comment, Task)
 │   └── TS.Model.csproj
-├── TS.ServiceLogic
+│
+├── TS.ServiceLogic/
 │   ├── Common (Utility.cs)
-│   ├── Interfaces (IAuthService, ICommentService, ITaskService)
-│   ├── Services (AuthService, CommentService, TaskService)
+│   ├── Interfaces (IAuth, IComment, ITask)
+│   ├── Services (Auth, Comment, Task)
 │   └── TS.ServiceLogic.csproj
-├── TS.WebAPI
-│   ├── Controllers (AuthController, CommentController, TaskController)
-│   ├── Program.cs
-│   └── TS.WebAPI.csproj
-├── .gitignore
-└── README.md
+│
+└── TS.WebAPI/
+    ├── Controllers (Auth, Comment, Task)
+    ├── Program.cs
+    └── TS.WebAPI.csproj
