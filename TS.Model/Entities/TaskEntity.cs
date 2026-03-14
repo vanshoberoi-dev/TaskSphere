@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using TS.Contract.Enums;
 using TS.Model.Entities;
 using TS.Model.Entities.Auth;
 
@@ -23,14 +22,14 @@ public class TaskEntity : BaseEntity
     public string Remarks { get; set; } = string.Empty;
 
     [Required]
-    public required int CreatedByAdminId { get; set; }
+    public required int CreatedById { get; set; }
 
     public int? AssigneeId { get; set; }
 
     // Navigation property
 
-    [ForeignKey("CreatedByAdminId")]
-    public virtual UserEntity Admin { get; set; }
+    [ForeignKey("CreatedById")]
+    public virtual UserEntity Creator { get; set; }
 
     [ForeignKey("AssigneeId")]
     public virtual UserEntity? Assignee { get; set; }

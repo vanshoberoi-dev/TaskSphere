@@ -63,6 +63,21 @@ namespace TS.WebAPI.Controllers
             }
         }
 
+        [HttpGet("get-users")]
+        public async Task<IActionResult> GetUsers()
+        {
+            try
+            {
+                var result = await _authService.GetUsersAsync();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                var message = ex.InnerException?.Message ?? ex.Message;
+                return BadRequest(new { error = message });
+            }
+        }
+
         [Authorize]
         [HttpPut("delete-user")]
         public async Task<IActionResult> DeleteUser(DeleteUserRequestDTO request)

@@ -33,6 +33,8 @@ namespace TS.WebAPI.Controllers
             }
         }
 
+
+        [Authorize]
         [HttpPost("assign-task")]
         public async Task<IActionResult> AssignTask(AssignTaskRequestDTO request)
         {
@@ -41,13 +43,13 @@ namespace TS.WebAPI.Controllers
                 var result = await _taskService.AssignTaskAsync(request);
                 return Ok(result);
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 var message = ex.InnerException?.Message ?? ex.Message;
                 return BadRequest(new { error = message });
             }
 
         }
-
 
         [HttpGet("get-all-tasks")]
         public async Task<IActionResult> GetTasks() {
@@ -62,12 +64,13 @@ namespace TS.WebAPI.Controllers
         }
 
 
-        [HttpGet("get-task/{id}")]
-        public async Task<IActionResult> GetTaskByID(int id)
+
+        [HttpGet("get-task/{TaskId}")]
+        public async Task<IActionResult> GetTaskByID(int TaskId)
         {
             try
             {
-                return Ok(await _taskService.GetTaskByIDAsync(id));
+                return Ok(await _taskService.GetTaskByIDAsync(TaskId));
             }
             catch (Exception ex) {
                 var message = ex.InnerException?.Message ?? ex.Message;

@@ -9,7 +9,6 @@ using System.Text;
 using TS.Contract.DTOs.Auth;
 using TS.Model.Data;
 using TS.Model.Entities.Auth;
-using TS.ServiceLogic.Common;
 using TS.ServiceLogic.Interfaces;
 
 namespace TS.ServiceLogic.Services
@@ -37,7 +36,7 @@ namespace TS.ServiceLogic.Services
 
             if (user == null || !Argon2.Verify(user.PasswordHash, request.Password))
             {
-                throw new UnauthorizedAccessException("Invalid credentials");
+                return "Invalid credentials";
             }
 
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -86,7 +85,7 @@ namespace TS.ServiceLogic.Services
         {
             if (await _context.Users.AnyAsync(u => u.Email == request.Email))
             {
-                throw new InvalidOperationException("A user with this Email already exists.");
+                return "A user with this Email already exists.";
             }
 
             var user = new UserEntity
@@ -104,6 +103,20 @@ namespace TS.ServiceLogic.Services
             return $"User Registered Successfully with ID {user.Id}";
         }
 
+        public async Task<ICollection<GetUsersResponseDTO>> GetUsersAsync()
+        {
+            return await _context.Users
+                .AsNoTracking()
+                .Select(u => new GetUsersResponseDTO
+                {
+                    Id = u.Id,
+                    Username = u.Name,
+                    Email = u.Email,
+                    Role = u.Role.Role
+                })
+                .ToListAsync();
+        }
+
         public async Task<string> DeleteUserAsync(DeleteUserRequestDTO request)
         {
           
@@ -113,18 +126,17 @@ namespace TS.ServiceLogic.Services
                 .FirstOrDefaultAsync(u => u.Email == request.Email);
 
             if (user == null)
-                throw new KeyNotFoundException("User not found");
+                return "User not found";
 
             if (user.IsDeleted)
-                throw new InvalidOperationException("User is already deleted.");
+                return "User is already deleted.";
 
             var activeTasks = await _context.Tasks.AnyAsync(t =>
                 t.AssigneeId == user.Id &&
                 t.Status != TS.Contract.Enums.TaskStatus.Completed);
 
             if (activeTasks)
-                throw new InvalidOperationException(
-                    "User cannot be deleted because they still have active tasks.");
+                return "User cannot be deleted because they still have active tasks.";
 
             user.IsDeleted = true;
 

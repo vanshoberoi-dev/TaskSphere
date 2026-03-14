@@ -24,18 +24,19 @@ namespace TS.WebAPI.Controllers
             {
                 return Ok(await _commentService.AddCommentAsync(request));
             }
-            catch(Exception ex) {
+            catch (Exception ex)
+            {
                 var message = ex.InnerException?.Message ?? ex.Message;
                 return BadRequest(new { error = message });
             }
         }
 
-        [Authorize]
-        [HttpPost("get-comments/{Id}")]
-        public async Task<IActionResult> ShowComments(int Id)
+        [HttpGet("show-comments/{TaskId}")]
+        public async Task<IActionResult> ShowComments(int TaskId)
         {
-            try {
-                return Ok(await _commentService.ShowCommentsAsync(Id));
+            try
+            {
+                return Ok(await _commentService.ShowCommentsAsync(TaskId));
             }
             catch (Exception ex)
             {
@@ -44,13 +45,14 @@ namespace TS.WebAPI.Controllers
             }
         }
 
+       
         [Authorize]
-        [HttpPut("delete-comment/{commentId}")]
-        public async Task<IActionResult> DeleteComment(int commentId)
+        [HttpPut("delete-comment/{CommentId}")]
+        public async Task<IActionResult> DeleteComment(int CommentId)
         {
             try
             {
-                var result = await _commentService.DeleteCommentAsync(commentId);
+                var result = await _commentService.DeleteCommentAsync(CommentId);
                 return Ok(new { Message = result });
             }
             catch (Exception ex)

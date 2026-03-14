@@ -1,12 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-public class AssignTaskRequestDTO
+namespace TS.Contract.DTOs.Task
 {
-    [Required]
-    public required int TaskId { get; set; }
+    public class AssignTaskRequestDTO
+    {
+        [Required]
+        public required int TaskId { get; set; }
 
-    [Required]
-    public required string AssigneeEmail { get; set; }
+        [Required]
+        public required string AssigneeEmail { get; set; }
 
-    public bool ForcedAssign { get; set; }
+        public bool ForcedAssign { get; set; }
+    }
 }
