@@ -28,10 +28,13 @@ namespace TS.WebAPI.Controllers
             }
 
             catch (Exception ex) {
-                return BadRequest($"Error Occurred : {ex.InnerException}");
+                var message = ex.InnerException?.Message ?? ex.Message;
+                return BadRequest(new { error = message });
             }
         }
 
+
+        [Authorize]
         [HttpPost("assign-task")]
         public async Task<IActionResult> AssignTask(AssignTaskRequestDTO request)
         {
@@ -40,31 +43,38 @@ namespace TS.WebAPI.Controllers
                 var result = await _taskService.AssignTaskAsync(request);
                 return Ok(result);
             }
-            catch (Exception ex) {
-                return BadRequest($"Error occured : {ex.InnerException}");
+            catch (Exception ex)
+            {
+                var message = ex.InnerException?.Message ?? ex.Message;
+                return BadRequest(new { error = message });
             }
 
         }
-
 
         [HttpGet("get-all-tasks")]
         public async Task<IActionResult> GetTasks() {
             try {
                 return Ok(await _taskService.GetTasksAsync());
             }
-            catch (Exception ex) { return BadRequest($"Error Occured : {ex.InnerException}"); }
+            catch (Exception ex)
+            {
+                var message = ex.InnerException?.Message ?? ex.Message;
+                return BadRequest(new { error = message });
+            }
         }
 
 
-        [HttpGet("get-task/{id}")]
-        public async Task<IActionResult> GetTaskByID(int id)
+
+        [HttpGet("get-task/{TaskId}")]
+        public async Task<IActionResult> GetTaskByID(int TaskId)
         {
             try
             {
-                return Ok(await _taskService.GetTaskByIDAsync(id));
+                return Ok(await _taskService.GetTaskByIDAsync(TaskId));
             }
             catch (Exception ex) {
-                return BadRequest($"Error Occured : {ex.InnerException}");
+                var message = ex.InnerException?.Message ?? ex.Message;
+                return BadRequest(new { error = message });
             }
         }
 
@@ -78,14 +88,15 @@ namespace TS.WebAPI.Controllers
                 return Ok(result);
             }
             catch (Exception ex) {
-                return BadRequest($"Error occured : {ex.InnerException}");
+                var message = ex.InnerException?.Message ?? ex.Message;
+                return BadRequest(new { error = message });
             }
 
 
 
         }
         [Authorize]
-        [HttpDelete("delete-task")]
+        [HttpPut("delete-task")]
         public async Task<IActionResult> DeleteTask(DeleteTaskRequestDTO request)
         {
             try {
@@ -93,7 +104,8 @@ namespace TS.WebAPI.Controllers
                 return Ok("Task deleted successfully");
             }
             catch (Exception ex) {
-                return BadRequest($"Error Occured : {ex.InnerException}");
+                var message = ex.InnerException?.Message ?? ex.Message;
+                return BadRequest(new { error = message });
             }
         }
 
@@ -106,8 +118,9 @@ namespace TS.WebAPI.Controllers
                 var result = await _taskService.UpdateTaskAsync(request);
                 return Ok(result);
             }
-            catch (Exception ex) { 
-                    return BadRequest($"Error Occured : {ex.InnerException}");
+            catch (Exception ex) {
+                var message = ex.InnerException?.Message ?? ex.Message;
+                return BadRequest(new { error = message });
             }
         }
 

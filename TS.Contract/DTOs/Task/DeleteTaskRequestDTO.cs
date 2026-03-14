@@ -6,5 +6,7 @@ namespace TS.Contract.DTOs.Task
     {
         [Required]
         public required int TaskId { get; set; }
+
+        public bool ForceDelete { get; set; } = false;
     }
 }

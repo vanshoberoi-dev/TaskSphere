@@ -1,10 +1,11 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using TS.Model.Data;
-using TS.ServiceLogic.Services;
 using TS.ServiceLogic.Interfaces;
+using TS.ServiceLogic.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,11 +14,17 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddHttpContextAccessor();
-
-
-// Configured Swagger to include JWT authentication
 builder.Services.AddSwaggerGen(options =>
 {
+    
+    options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Title = "JIRA Based Application",
+        
+        Description = "API for managing Tasks, Users and Comments similar to JIRA"
+    });
+    //options.OrderActionsBy(apiDesc => apiDesc.RelativePath);
+
     options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -43,7 +50,6 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 });
-
 var jwtKey = builder.Configuration["JwtSettings:Key"];
 var key = Encoding.UTF8.GetBytes(jwtKey!);
 

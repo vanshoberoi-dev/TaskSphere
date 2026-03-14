@@ -24,36 +24,41 @@ namespace TS.WebAPI.Controllers
             {
                 return Ok(await _commentService.AddCommentAsync(request));
             }
-            catch(Exception ex) {
-                return BadRequest($"Error occured : {ex.InnerException}");
-            }
-        }
-
-        [Authorize]
-        [HttpPost("get-comments/{Id}")]
-        public async Task<IActionResult> ShowComments(int Id)
-        {
-            try {
-                return Ok(await _commentService.ShowCommentsAsync(Id));
-            }
             catch (Exception ex)
             {
-                return BadRequest($"Error occured : {ex.InnerException}");
+                var message = ex.InnerException?.Message ?? ex.Message;
+                return BadRequest(new { error = message });
             }
         }
 
-        [Authorize]
-        [HttpDelete("delete-comment/{commentId}")]
-        public async Task<IActionResult> DeleteComment(int commentId)
+        [HttpGet("show-comments/{TaskId}")]
+        public async Task<IActionResult> ShowComments(int TaskId)
         {
             try
             {
-                var result = await _commentService.DeleteCommentAsync(commentId);
+                return Ok(await _commentService.ShowCommentsAsync(TaskId));
+            }
+            catch (Exception ex)
+            {
+                var message = ex.InnerException?.Message ?? ex.Message;
+                return BadRequest(new { error = message });
+            }
+        }
+
+       
+        [Authorize]
+        [HttpPut("delete-comment/{CommentId}")]
+        public async Task<IActionResult> DeleteComment(int CommentId)
+        {
+            try
+            {
+                var result = await _commentService.DeleteCommentAsync(CommentId);
                 return Ok(new { Message = result });
             }
             catch (Exception ex)
             {
-                return BadRequest($"Error occurred: {ex.InnerException}");
+                var message = ex.InnerException?.Message ?? ex.Message;
+                return BadRequest(new { error = message });
             }
         }
     }
