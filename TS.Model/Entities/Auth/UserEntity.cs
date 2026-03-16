@@ -13,7 +13,7 @@ namespace TS.Model.Entities.Auth
         [Required, StringLength(500)]
         public string PasswordHash { get; set; }
 
-        public int RoleId { get; set; } = 1; // Default to "User" role
+        public int RoleId { get; set; }
 
         [ForeignKey("RoleId")]
         public virtual RoleEntity Role { get; set; }
