@@ -66,6 +66,16 @@ namespace TS.ServiceLogic.Services
 
         public async Task<CreateRoleResponseDTO> CreateRoleAsync(CreateRoleRequestDTO request)
         {
+            var existingRole = await _context.Roles.FirstOrDefaultAsync(r => r.Role == request.Role);
+
+            if (existingRole != null)
+            {
+                return new CreateRoleResponseDTO
+                {
+                    Message = $"Role '{request.Role}' already exists with ID {existingRole.Id}."
+                };
+            }
+
             var role = new RoleEntity
             {
                 Role = request.Role
