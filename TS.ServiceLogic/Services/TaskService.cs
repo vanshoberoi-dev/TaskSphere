@@ -172,6 +172,7 @@ namespace TS.ServiceLogic.Services
             task.Description = request.Description;
             task.Status = request.Status;
             task.DueDate = DateTime.UtcNow.AddDays(request.DueInDays);
+            task.Remarks = request.Remarks;
 
             await _context.SaveChangesAsync();
 
