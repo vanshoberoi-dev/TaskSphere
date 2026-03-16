@@ -101,7 +101,7 @@ namespace TS.WebAPI.Controllers
         {
             try {
                 var result = await _taskService.DeleteTaskAsync(request);
-                return Ok("Task deleted successfully");
+                return Ok(result);
             }
             catch (Exception ex) {
                 var message = ex.InnerException?.Message ?? ex.Message;
