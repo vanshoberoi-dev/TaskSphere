@@ -42,7 +42,7 @@ namespace TS.ServiceLogic.Services
         }
         
 
-        public async Task<string> AssignTaskAsync(AssignTaskRequestDTO request)
+        public async Task<GeneralResponseDTO> AssignTaskAsync(AssignTaskRequestDTO request)
         {
             Utility.ValidateAdminAndGetId(_httpContextAccessor.HttpContext?.User);
 
@@ -68,13 +68,17 @@ namespace TS.ServiceLogic.Services
 
             if (previousAssigneeId != null && request.ForcedAssign)
             {
-                return $"Task '{task.Title}' (ID: {task.Id}) reassigned to '{assignee.Email}' successfully.";
+                return new GeneralResponseDTO() {
+                    Message = $"Task '{task.Title}' (ID: {task.Id}) reassigned to '{assignee.Email}' successfully."
+                };
             }
 
-            return $"Task '{task.Title}' (ID: {task.Id}) assigned to '{assignee.Email}' successfully.";
+            return new GeneralResponseDTO() {
+                Message = $"Task '{task.Title}' (ID: {task.Id}) assigned to '{assignee.Email}' successfully."
+            };
         }
 
-        public async Task<string> ChangeTaskStatusAsync(ChangeTaskStatusRequestDTO request)
+        public async Task<GeneralResponseDTO> ChangeTaskStatusAsync(ChangeTaskStatusRequestDTO request)
         {
             var userId = Utility.ValidateUserAndGetId(_httpContextAccessor.HttpContext?.User);
 
@@ -92,7 +96,10 @@ namespace TS.ServiceLogic.Services
 
             await _context.SaveChangesAsync();
 
-            return $"Task Status Updated to {task.Status}";
+            return new GeneralResponseDTO()
+            {
+                Message = $@"Task '{task.Title}' (ID: {task.Id}) status updated to {task.Status} successfully."
+            };
         }
 
         public async Task<IEnumerable<GetTaskResponseDTO>> GetTasksAsync()
@@ -140,7 +147,7 @@ namespace TS.ServiceLogic.Services
             return response;
         }
 
-        public async Task<string> DeleteTaskAsync(DeleteTaskRequestDTO request)
+        public async Task<GeneralResponseDTO> DeleteTaskAsync(DeleteTaskRequestDTO request)
         {
             Utility.ValidateAdminAndGetId(_httpContextAccessor.HttpContext?.User);
 
@@ -151,16 +158,20 @@ namespace TS.ServiceLogic.Services
 
             if ((task.Status == TS.Contract.Enums.TaskStatus.InProgress || task.Status == TS.Contract.Enums.TaskStatus.Completed) && !request.ForceDelete)
             {
-                return "InProgress or Completed tasks cannot be deleted without ForceDelete.";
+                return new GeneralResponseDTO() {
+                    Message = "InProgress or Completed tasks cannot be deleted without ForceDelete."
+                };
             }
 
             task.IsDeleted = true;
             await _context.SaveChangesAsync();
 
-            return $"Task {task.Id} Deleted Successfully";
+            return new GeneralResponseDTO() {
+                Message = $"Task '{task.Title}' (ID: {task.Id}) deleted successfully."
+            };
         }
 
-        public async Task<string> UpdateTaskAsync(UpdateTaskRequestDTO request)
+        public async Task<GeneralResponseDTO> UpdateTaskAsync(UpdateTaskRequestDTO request)
         {
             Utility.ValidateAdminAndGetId(_httpContextAccessor.HttpContext?.User);
 
@@ -177,7 +188,9 @@ namespace TS.ServiceLogic.Services
 
             await _context.SaveChangesAsync();
 
-            return $"Task {task.Id} Updated Successfully";
+            return new GeneralResponseDTO() {
+                Message = $"Task {task.Id} Updated Successfully"
+            };
         }
     }
 }
