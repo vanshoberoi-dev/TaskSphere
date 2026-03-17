@@ -5,6 +5,7 @@ using TS.Model.Data;
 using TS.Model.Entities;
 using TS.ServiceLogic.Common;
 using TS.ServiceLogic.Interfaces;
+using static TS.ServiceLogic.Common.Exceptions;
 
 namespace TS.ServiceLogic.Services
 {
@@ -24,7 +25,7 @@ namespace TS.ServiceLogic.Services
             var taskExists = await _context.Tasks.AnyAsync(t => t.Id == request.TaskId);
             if (!taskExists)
             {
-                return $"Task with ID {request.TaskId} not found.";
+                throw new NotFoundException($"Task with ID {request.TaskId} not found.");
             }
 
             int userId = Utility.ValidateUserAndGetId(_httpContextAccessor.HttpContext?.User);
@@ -47,7 +48,7 @@ namespace TS.ServiceLogic.Services
             var taskExists = await _context.Tasks.AnyAsync(t => t.Id == taskId);
             if (!taskExists)
             {
-                throw new KeyNotFoundException($"Task with ID {taskId} not found.");
+                throw new NotFoundException($"Task with ID {taskId} not found.");
             }
 
             var comments = await _context.Comments
@@ -75,7 +76,7 @@ namespace TS.ServiceLogic.Services
             
             if (comment == null)
             {
-                return $"Comment with ID {commentId} not found.";
+                 throw new NotFoundException($"Comment with ID {commentId} not found.");
             }
 
             if (comment.UserId != currentUserId)

@@ -4,6 +4,7 @@ using TS.Contract.DTOs.Task;
 using TS.Model.Data;
 using TS.ServiceLogic.Interfaces;
 using TS.ServiceLogic.Common;
+using static TS.ServiceLogic.Common.Exceptions;
 
 namespace TS.ServiceLogic.Services
 {
@@ -48,16 +49,16 @@ namespace TS.ServiceLogic.Services
             var task = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == request.TaskId);
 
             if (task == null)
-                return $"Task with ID {request.TaskId} not found.";
+                throw new NotFoundException($"Task with ID {request.TaskId} not found.");
 
             var assignee = await _context.Users
                 .FirstOrDefaultAsync(u => u.Email == request.AssigneeEmail);
 
             if (assignee == null)
-                return $"User with email {request.AssigneeEmail} not found.";
+                throw new NotFoundException($"User with email {request.AssigneeEmail} not found.");
 
             if (task.AssigneeId != null && !request.ForcedAssign)
-                return $"Task is already assigned. Use ForcedAssign to reassign.";
+                throw new NotFoundException($"Task is already assigned. Use ForcedAssign to reassign.");
 
             var previousAssigneeId = task.AssigneeId;
 
@@ -80,11 +81,11 @@ namespace TS.ServiceLogic.Services
             var task = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == request.TaskId);
 
             if (task == null)
-                return $"Task with ID {request.TaskId} was not found.";
+                throw new NotFoundException($"Task with ID {request.TaskId} was not found.");
 
             if (userId != task.CreatedById)
             {
-                return $"Only the creator of the task can change its status. Task created by user ID {task.CreatedById}.";
+                throw new UnauthorizedAccessException($"Only the creator of the task can change its status. Task created by user ID {task.CreatedById}.");
             }
 
             task.Status = request.TaskStatus;
@@ -134,7 +135,7 @@ namespace TS.ServiceLogic.Services
                 .FirstOrDefaultAsync();
 
             if (response == null)
-                throw new KeyNotFoundException($"Task with ID {taskId} was not found.");
+                throw new NotFoundException($"Task with ID {taskId} was not found.");
 
             return response;
         }
@@ -146,7 +147,7 @@ namespace TS.ServiceLogic.Services
             var task = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == request.TaskId);
 
             if (task == null)
-                return $"Task with ID {request.TaskId} was not found.";
+                throw new NotFoundException ($"Task with ID {request.TaskId} was not found.");
 
             if ((task.Status == TS.Contract.Enums.TaskStatus.InProgress || task.Status == TS.Contract.Enums.TaskStatus.Completed) && !request.ForceDelete)
             {
@@ -166,7 +167,7 @@ namespace TS.ServiceLogic.Services
             var task = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == request.TaskId);
 
             if (task == null)
-                return $"Task with ID {request.TaskId} was not found.";
+                throw new NotFoundException ($"Task with ID {request.TaskId} was not found.");
 
             task.Title = request.Title;
             task.Description = request.Description;

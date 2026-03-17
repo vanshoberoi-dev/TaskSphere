@@ -10,6 +10,7 @@ using TS.Contract.DTOs.Auth;
 using TS.Model.Data;
 using TS.Model.Entities.Auth;
 using TS.ServiceLogic.Interfaces;
+using static TS.ServiceLogic.Common.Exceptions;
 
 namespace TS.ServiceLogic.Services
 {
@@ -36,7 +37,7 @@ namespace TS.ServiceLogic.Services
 
             if (user == null || !Argon2.Verify(user.PasswordHash, request.Password))
             {
-                return "Invalid credentials";
+                throw new UnauthorizedAccessException("Invalid credentials");
             }
 
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -95,7 +96,7 @@ namespace TS.ServiceLogic.Services
         {
             if (await _context.Users.AnyAsync(u => u.Email == request.Email))
             {
-                return "A user with this Email already exists.";
+                throw new InvalidOperationException("A user with this Email already exists.");
             }
 
             var user = new UserEntity
@@ -136,10 +137,10 @@ namespace TS.ServiceLogic.Services
                 .FirstOrDefaultAsync(u => u.Email == request.Email);
 
             if (user == null)
-                return "User not found";
+                throw new NotFoundException("User not found");
 
             if (user.IsDeleted)
-                return "User is already deleted.";
+                throw new NotFoundException("User is already deleted");
 
             var activeTasks = await _context.Tasks.AnyAsync(t =>
                 t.AssigneeId == user.Id &&
