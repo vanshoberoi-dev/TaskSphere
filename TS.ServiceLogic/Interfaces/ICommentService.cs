@@ -4,9 +4,10 @@ namespace TS.ServiceLogic.Interfaces
 {
     public interface ICommentService
     {
-        Task<string> AddCommentAsync(AddCommentRequestDTO request);
-        Task<List<CommentResponseDTO>> ShowCommentsAsync(int taskId);
+        Task<AddCommentResponseDTO> AddCommentAsync(AddCommentRequestDTO request);
 
-        Task<string> DeleteCommentAsync(int commentId);
+        Task<ICollection<CommentResponseDTO>> ShowCommentsAsync(int taskId);
+
+        Task<DeleteCommentResponseDTO> DeleteCommentAsync(int commentId);
     }
 }

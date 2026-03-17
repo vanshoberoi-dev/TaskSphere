@@ -20,7 +20,7 @@ namespace TS.ServiceLogic.Services
             _context = context;
         }
 
-        public async Task<string> AddCommentAsync(AddCommentRequestDTO request)
+        public async Task<AddCommentResponseDTO> AddCommentAsync(AddCommentRequestDTO request)
         {
             var taskExists = await _context.Tasks.AnyAsync(t => t.Id == request.TaskId);
             if (!taskExists)
@@ -40,10 +40,13 @@ namespace TS.ServiceLogic.Services
             _context.Comments.Add(newComment);
             await _context.SaveChangesAsync();
 
-            return $"Commented ! Comment ID : {newComment.Id}";
+            return new AddCommentResponseDTO() { 
+                CommentId = newComment.Id,
+                Message = "Comment added successfully."
+            };
         }
 
-        public async Task<List<CommentResponseDTO>> ShowCommentsAsync(int taskId)
+        public async Task<ICollection<CommentResponseDTO>> ShowCommentsAsync(int taskId)
         {
             var taskExists = await _context.Tasks.AnyAsync(t => t.Id == taskId);
             if (!taskExists)
@@ -68,7 +71,7 @@ namespace TS.ServiceLogic.Services
             return comments;
         }
 
-        public async Task<string> DeleteCommentAsync(int commentId)
+        public async Task<DeleteCommentResponseDTO> DeleteCommentAsync(int commentId)
         {
             int currentUserId = Utility.ValidateUserAndGetId(_httpContextAccessor.HttpContext?.User);
 
@@ -81,13 +84,17 @@ namespace TS.ServiceLogic.Services
 
             if (comment.UserId != currentUserId)
             {
-                return "You do not have permission to delete this comment.";
+                return new DeleteCommentResponseDTO(){
+                    Message = "You do not have permission to delete this comment."
+                };
             }
 
             comment.IsDeleted = true;
             await _context.SaveChangesAsync();
 
-            return "Comment deleted successfully.";
+            return new DeleteCommentResponseDTO() { 
+                Message= "Comment deleted successfully." 
+            };
         }
     }
 }
