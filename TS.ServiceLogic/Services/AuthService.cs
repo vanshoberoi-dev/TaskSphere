@@ -134,7 +134,7 @@ namespace TS.ServiceLogic.Services
             TS.ServiceLogic.Common.Utility.ValidateAdminAndGetId(_httpContextAccessor.HttpContext?.User);
 
             var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.Email == request.Email);
+                .FirstOrDefaultAsync(u => u.Id == request.UserId);
 
             if (user == null)
                 throw new NotFoundException("User not found");

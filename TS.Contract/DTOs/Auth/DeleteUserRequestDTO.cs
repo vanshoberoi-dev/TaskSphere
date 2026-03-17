@@ -5,7 +5,7 @@ namespace TS.Contract.DTOs.Auth
     public class DeleteUserRequestDTO
     {
         [Required]
-        public required string Email { get; set; }
+        public required int UserId { get; set; }
 
     }
 }

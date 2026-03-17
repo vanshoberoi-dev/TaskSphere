@@ -52,10 +52,10 @@ namespace TS.ServiceLogic.Services
                 throw new NotFoundException($"Task with ID {request.TaskId} not found.");
 
             var assignee = await _context.Users
-                .FirstOrDefaultAsync(u => u.Email == request.AssigneeEmail);
-
+                .FirstOrDefaultAsync(u => u.Id == request.AssigneeUserId);
+            
             if (assignee == null)
-                throw new NotFoundException($"User with email {request.AssigneeEmail} not found.");
+                throw new NotFoundException($"User with email {request.AssigneeUserId} not found.");
 
             if (task.AssigneeId != null && !request.ForcedAssign)
                 throw new NotFoundException($"Task is already assigned. Use ForcedAssign to reassign.");
