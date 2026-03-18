@@ -5,6 +5,7 @@ using Serilog;
 using System.Text;
 using TS.API.Interceptors;
 using TS.API.Middlewares;
+using TS.Infrastructure.Data;
 using TS.Model.Data;
 using TS.ServiceLogic.Interfaces;
 using TS.ServiceLogic.Services;
@@ -100,6 +101,13 @@ builder.Services.AddDbContext<AppDbContext>((serviceProvider, options) =>
 });
 
 var app = builder.Build();
+
+//Run the below code once, when your local DB is populated comment this out to avoid redundant logs.
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await DbSeeder.SeedAsync(context);
+}
 
 app.UseExceptionHandler();
 app.UseSerilogRequestLogging(options =>
