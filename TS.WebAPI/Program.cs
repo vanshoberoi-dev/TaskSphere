@@ -1,19 +1,34 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 using System.Text;
+using TS.API.Interceptors;
+using TS.API.Middlewares;
 using TS.Model.Data;
 using TS.ServiceLogic.Interfaces;
 using TS.ServiceLogic.Services;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Logging.ClearProviders();
+
+builder.Host.UseSerilog((context, services, configuration) => configuration
+    .ReadFrom.Configuration(context.Configuration)
+    .ReadFrom.Services(services)
+    .Enrich.FromLogContext());
+
 builder.Services.AddControllers();
-
 builder.Services.AddEndpointsApiExplorer();
-
 builder.Services.AddHttpContextAccessor();
+// Global Exception Handler and Problem Details
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
+// DB Query Interceptor
+builder.Services.AddScoped<QueryTimerInterceptor>();
+
 builder.Services.AddSwaggerGen(options =>
 {
     
@@ -78,9 +93,19 @@ builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 
 // Configured Db Context
-builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("TSConnectionString")));
+builder.Services.AddDbContext<AppDbContext>((serviceProvider, options) =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("TSConnectionString"))
+           .AddInterceptors(serviceProvider.GetRequiredService<QueryTimerInterceptor>());
+});
 
 var app = builder.Build();
+
+app.UseExceptionHandler();
+app.UseSerilogRequestLogging(options =>
+{
+    options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.00} ms";
+});
 
 if (app.Environment.IsDevelopment())
 {

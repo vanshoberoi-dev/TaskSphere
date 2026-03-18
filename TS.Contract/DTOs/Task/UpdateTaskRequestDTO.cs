@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace TS.Contract.DTOs.Task
+﻿namespace TS.Contract.DTOs.Task
 {
     public class UpdateTaskRequestDTO
     {
