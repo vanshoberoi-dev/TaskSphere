@@ -4,6 +4,7 @@ using TS.Contract.DTOs.Task;
 using TS.Model.Data;
 using TS.ServiceLogic.Interfaces;
 using TS.ServiceLogic.Common;
+using static TS.ServiceLogic.Common.Exceptions;
 
 namespace TS.ServiceLogic.Services
 {
@@ -41,23 +42,23 @@ namespace TS.ServiceLogic.Services
         }
         
 
-        public async Task<string> AssignTaskAsync(AssignTaskRequestDTO request)
+        public async Task<GeneralResponseDTO> AssignTaskAsync(AssignTaskRequestDTO request)
         {
             Utility.ValidateAdminAndGetId(_httpContextAccessor.HttpContext?.User);
 
             var task = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == request.TaskId);
 
             if (task == null)
-                return $"Task with ID {request.TaskId} not found.";
+                throw new NotFoundException($"Task with ID {request.TaskId} not found.");
 
             var assignee = await _context.Users
-                .FirstOrDefaultAsync(u => u.Email == request.AssigneeEmail);
-
+                .FirstOrDefaultAsync(u => u.Id == request.AssigneeUserId);
+            
             if (assignee == null)
-                return $"User with email {request.AssigneeEmail} not found.";
+                throw new NotFoundException($"User with email {request.AssigneeUserId} not found.");
 
             if (task.AssigneeId != null && !request.ForcedAssign)
-                return $"Task is already assigned. Use ForcedAssign to reassign.";
+                throw new NotFoundException($"Task is already assigned. Use ForcedAssign to reassign.");
 
             var previousAssigneeId = task.AssigneeId;
 
@@ -67,31 +68,38 @@ namespace TS.ServiceLogic.Services
 
             if (previousAssigneeId != null && request.ForcedAssign)
             {
-                return $"Task '{task.Title}' (ID: {task.Id}) reassigned to '{assignee.Email}' successfully.";
+                return new GeneralResponseDTO() {
+                    Message = $"Task '{task.Title}' (ID: {task.Id}) reassigned to '{assignee.Email}' successfully."
+                };
             }
 
-            return $"Task '{task.Title}' (ID: {task.Id}) assigned to '{assignee.Email}' successfully.";
+            return new GeneralResponseDTO() {
+                Message = $"Task '{task.Title}' (ID: {task.Id}) assigned to '{assignee.Email}' successfully."
+            };
         }
 
-        public async Task<string> ChangeTaskStatusAsync(ChangeTaskStatusRequestDTO request)
+        public async Task<GeneralResponseDTO> ChangeTaskStatusAsync(ChangeTaskStatusRequestDTO request)
         {
             var userId = Utility.ValidateUserAndGetId(_httpContextAccessor.HttpContext?.User);
 
             var task = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == request.TaskId);
 
             if (task == null)
-                return $"Task with ID {request.TaskId} was not found.";
+                throw new NotFoundException($"Task with ID {request.TaskId} was not found.");
 
             if (userId != task.CreatedById)
             {
-                return $"Only the creator of the task can change its status. Task created by user ID {task.CreatedById}.";
+                throw new UnauthorizedAccessException($"Only the creator of the task can change its status. Task created by user ID {task.CreatedById}.");
             }
 
             task.Status = request.TaskStatus;
 
             await _context.SaveChangesAsync();
 
-            return $"Task Status Updated to {task.Status}";
+            return new GeneralResponseDTO()
+            {
+                Message = $@"Task '{task.Title}' (ID: {task.Id}) status updated to {task.Status} successfully."
+            };
         }
 
         public async Task<IEnumerable<GetTaskResponseDTO>> GetTasksAsync()
@@ -134,39 +142,43 @@ namespace TS.ServiceLogic.Services
                 .FirstOrDefaultAsync();
 
             if (response == null)
-                throw new KeyNotFoundException($"Task with ID {taskId} was not found.");
+                throw new NotFoundException($"Task with ID {taskId} was not found.");
 
             return response;
         }
 
-        public async Task<string> DeleteTaskAsync(DeleteTaskRequestDTO request)
+        public async Task<GeneralResponseDTO> DeleteTaskAsync(DeleteTaskRequestDTO request)
         {
             Utility.ValidateAdminAndGetId(_httpContextAccessor.HttpContext?.User);
 
             var task = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == request.TaskId);
 
             if (task == null)
-                return $"Task with ID {request.TaskId} was not found.";
+                throw new NotFoundException ($"Task with ID {request.TaskId} was not found.");
 
             if ((task.Status == TS.Contract.Enums.TaskStatus.InProgress || task.Status == TS.Contract.Enums.TaskStatus.Completed) && !request.ForceDelete)
             {
-                return "InProgress or Completed tasks cannot be deleted without ForceDelete.";
+                return new GeneralResponseDTO() {
+                    Message = "InProgress or Completed tasks cannot be deleted without ForceDelete."
+                };
             }
 
             task.IsDeleted = true;
             await _context.SaveChangesAsync();
 
-            return $"Task {task.Id} Deleted Successfully";
+            return new GeneralResponseDTO() {
+                Message = $"Task '{task.Title}' (ID: {task.Id}) deleted successfully."
+            };
         }
 
-        public async Task<string> UpdateTaskAsync(UpdateTaskRequestDTO request)
+        public async Task<GeneralResponseDTO> UpdateTaskAsync(UpdateTaskRequestDTO request)
         {
             Utility.ValidateAdminAndGetId(_httpContextAccessor.HttpContext?.User);
 
             var task = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == request.TaskId);
 
             if (task == null)
-                return $"Task with ID {request.TaskId} was not found.";
+                throw new NotFoundException ($"Task with ID {request.TaskId} was not found.");
 
             task.Title = request.Title;
             task.Description = request.Description;
@@ -176,7 +188,9 @@ namespace TS.ServiceLogic.Services
 
             await _context.SaveChangesAsync();
 
-            return $"Task {task.Id} Updated Successfully";
+            return new GeneralResponseDTO() {
+                Message = $"Task {task.Id} Updated Successfully"
+            };
         }
     }
 }

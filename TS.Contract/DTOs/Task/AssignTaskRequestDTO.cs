@@ -8,7 +8,7 @@ namespace TS.Contract.DTOs.Task
         public required int TaskId { get; set; }
 
         [Required]
-        public required string AssigneeEmail { get; set; }
+        public required int AssigneeUserId { get; set; }
 
         public bool ForcedAssign { get; set; }
     }

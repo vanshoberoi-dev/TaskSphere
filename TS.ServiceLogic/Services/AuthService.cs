@@ -10,6 +10,7 @@ using TS.Contract.DTOs.Auth;
 using TS.Model.Data;
 using TS.Model.Entities.Auth;
 using TS.ServiceLogic.Interfaces;
+using static TS.ServiceLogic.Common.Exceptions;
 
 namespace TS.ServiceLogic.Services
 {
@@ -28,7 +29,7 @@ namespace TS.ServiceLogic.Services
         }
 
 
-        public async Task<string> LoginUserAsync(LoginUserRequestDTO request)
+        public async Task<LoginUserResponseDTO> LoginUserAsync(LoginUserRequestDTO request)
         {
             var user = await _context.Users
                 .Include(u => u.Role)
@@ -36,7 +37,7 @@ namespace TS.ServiceLogic.Services
 
             if (user == null || !Argon2.Verify(user.PasswordHash, request.Password))
             {
-                return "Invalid credentials";
+                throw new UnauthorizedAccessException("Invalid credentials");
             }
 
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -61,7 +62,10 @@ namespace TS.ServiceLogic.Services
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
+            return new LoginUserResponseDTO()
+            {
+                Token = tokenHandler.WriteToken(token)
+            };
         }
 
         public async Task<CreateRoleResponseDTO> CreateRoleAsync(CreateRoleRequestDTO request)
@@ -95,7 +99,7 @@ namespace TS.ServiceLogic.Services
         {
             if (await _context.Users.AnyAsync(u => u.Email == request.Email))
             {
-                return "A user with this Email already exists.";
+                throw new InvalidOperationException("A user with this Email already exists.");
             }
 
             var user = new UserEntity
@@ -127,32 +131,37 @@ namespace TS.ServiceLogic.Services
                 .ToListAsync();
         }
 
-        public async Task<string> DeleteUserAsync(DeleteUserRequestDTO request)
+        public async Task<DeleteUserResponseDTO> DeleteUserAsync(DeleteUserRequestDTO request)
         {
           
             TS.ServiceLogic.Common.Utility.ValidateAdminAndGetId(_httpContextAccessor.HttpContext?.User);
 
             var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.Email == request.Email);
+                .FirstOrDefaultAsync(u => u.Id == request.UserId);
 
             if (user == null)
-                return "User not found";
+                throw new NotFoundException("User not found");
 
             if (user.IsDeleted)
-                return "User is already deleted.";
+                throw new NotFoundException("User is already deleted");
 
             var activeTasks = await _context.Tasks.AnyAsync(t =>
                 t.AssigneeId == user.Id &&
                 t.Status != TS.Contract.Enums.TaskStatus.Completed);
 
             if (activeTasks)
-                return "User cannot be deleted because they still have active tasks.";
+                return new DeleteUserResponseDTO(){
+                    Message = "User cannot be deleted because they still have active tasks."
+                };
 
             user.IsDeleted = true;
 
             await _context.SaveChangesAsync();
 
-            return $"User '{user.Email}' deleted successfully.";
+            return new DeleteUserResponseDTO()
+            {
+                Message = $"User '{user.Email}' deleted successfully."
+            };
         }
     }
 }
