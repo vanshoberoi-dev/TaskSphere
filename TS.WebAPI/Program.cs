@@ -102,12 +102,12 @@ builder.Services.AddDbContext<AppDbContext>((serviceProvider, options) =>
 
 var app = builder.Build();
 
-//Run the below code once, when your local DB is populated comment this out to avoid redundant logs.
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    await DbSeeder.SeedAsync(context);
-}
+//Run the below code only when populating new data, otherwise it may do redundant logs.
+//using (var scope = app.Services.CreateScope())
+//{
+//    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+//    await DbSeeder.SeedAsync(context);
+//}
 
 app.UseExceptionHandler();
 app.UseSerilogRequestLogging(options =>

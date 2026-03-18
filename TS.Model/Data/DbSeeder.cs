@@ -12,25 +12,23 @@ namespace TS.Infrastructure.Data
     {
         public static async Task SeedAsync(AppDbContext context)
         {
-            // 1. ROLES
+            // 1. ROLES (Existing logic is fine)
             if (!await context.Roles.AnyAsync())
             {
                 var roles = new List<RoleEntity> { new() { Role = "Admin" }, new() { Role = "User" } };
                 await context.BulkInsertAsync(roles);
             }
-
             var adminRoleId = (await context.Roles.FirstAsync(r => r.Role == "Admin")).Id;
             var userRoleId = (await context.Roles.FirstAsync(r => r.Role == "User")).Id;
 
-            // 2. USERS (600k)
-            const int totalUserTarget = 600_000;
+            // 2. USERS (1.2M)
+            const int totalUserTarget = 2_400_000;
             int currentUserCount = await context.Users.CountAsync();
 
             if (currentUserCount < totalUserTarget)
             {
                 int remaining = totalUserTarget - currentUserCount;
                 string hashedPassword = Argon2.Hash("am i visible ?");
-
                 var userFaker = new Faker<UserEntity>()
                     .RuleFor(u => u.Name, f => f.Name.FullName())
                     .RuleFor(u => u.Email, (f, u) => $"{f.Internet.UserName(u.Name).ToLower()}{f.UniqueIndex}@company.com")
@@ -40,16 +38,20 @@ namespace TS.Infrastructure.Data
                 const int batchSize = 20000;
                 for (int i = 0; i < remaining; i += batchSize)
                 {
-                    var users = userFaker.Generate(Math.Min(batchSize, remaining - i));
-                    await context.BulkInsertAsync(users);
-                    Console.WriteLine($"Users: {currentUserCount + i + users.Count}/{totalUserTarget}");
+                    var countToGenerate = Math.Min(batchSize, remaining - i);
+                    await context.BulkInsertAsync(userFaker.Generate(countToGenerate));
+                    // Corrected Log: Shows the actual count now in the DB  
+                    Console.WriteLine($"Users: {currentUserCount + i + countToGenerate}/{totalUserTarget}");
                 }
             }
 
-            // 3. TASKS (100k)
-            const int totalTaskTarget = 100_000;
-            if (await context.Tasks.CountAsync() < totalTaskTarget)
+            // 3. TASKS (600k)
+            const int totalTaskTarget = 600_000;
+            int currentTaskCount = await context.Tasks.CountAsync();
+
+            if (currentTaskCount < totalTaskTarget)
             {
+                int remainingTasks = totalTaskTarget - currentTaskCount;
                 var adminIds = await context.Users.Where(u => u.RoleId == adminRoleId).Select(u => u.Id).Take(2000).ToListAsync();
                 var taskFaker = new Faker<TaskEntity>()
                     .RuleFor(t => t.Title, f => f.Commerce.ProductName())
@@ -58,19 +60,25 @@ namespace TS.Infrastructure.Data
                     .RuleFor(t => t.DueDate, f => f.Date.Future())
                     .RuleFor(t => t.CreatedById, f => f.PickRandom(adminIds));
 
-                for (int i = 0; i < 10; i++)
+                const int taskBatchSize = 10000;
+                // FIX: Loop based on 'remainingTasks', not a hardcoded '10'
+                for (int i = 0; i < remainingTasks; i += taskBatchSize)
                 {
-                    await context.BulkInsertAsync(taskFaker.Generate(10000));
-                    Console.WriteLine($"Tasks: {(i + 1) * 10000}/100000");
+                    var countToGenerate = Math.Min(taskBatchSize, remainingTasks - i);
+                    await context.BulkInsertAsync(taskFaker.Generate(countToGenerate));
+                    Console.WriteLine($"Tasks: {currentTaskCount + i + countToGenerate}/{totalTaskTarget}");
                 }
             }
 
-            // 4. COMMENTS (300k - Stress Test)
-            const int totalCommentTarget = 300_000;
-            if (await context.Comments.CountAsync() < totalCommentTarget)
+            // 4. COMMENTS (4.8M)
+            const int totalCommentTarget = 4_800_000;
+            int currentCommentCount = await context.Comments.CountAsync();
+
+            if (currentCommentCount < totalCommentTarget)
             {
-                Console.WriteLine("Preparing IDs for Comment seeding...");
-                // Pull a pool of valid Task and User IDs to link comments to
+                int remainingComments = totalCommentTarget - currentCommentCount;
+                Console.WriteLine($"Preparing IDs. Current: {currentCommentCount}. Remaining: {remainingComments}");
+
                 var taskIds = await context.Tasks.Select(t => t.Id).Take(10000).ToListAsync();
                 var userIds = await context.Users.Select(u => u.Id).Take(10000).ToListAsync();
 
@@ -80,11 +88,13 @@ namespace TS.Infrastructure.Data
                     .RuleFor(c => c.UserId, f => f.PickRandom(userIds))
                     .RuleFor(c => c.CreatedOn, f => f.Date.Past(1));
 
-                for (int i = 0; i < 30; i++) // 30 batches of 10k = 300k
+                const int commentBatchSize = 20000;
+                // FIX: Loop based on 'remainingComments', not hardcoded '30'
+                for (int i = 0; i < remainingComments; i += commentBatchSize)
                 {
-                    var comments = commentFaker.Generate(10000);
-                    await context.BulkInsertAsync(comments);
-                    Console.WriteLine($"Comments: {(i + 1) * 10000}/{totalCommentTarget}");
+                    var countToGenerate = Math.Min(commentBatchSize, remainingComments - i);
+                    await context.BulkInsertAsync(commentFaker.Generate(countToGenerate));
+                    Console.WriteLine($"Comments: {currentCommentCount + i + countToGenerate}/{totalCommentTarget}");
                 }
             }
         }
