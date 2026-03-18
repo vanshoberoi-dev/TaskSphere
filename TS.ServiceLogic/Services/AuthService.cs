@@ -29,7 +29,7 @@ namespace TS.ServiceLogic.Services
         }
 
 
-        public async Task<string> LoginUserAsync(LoginUserRequestDTO request)
+        public async Task<LoginUserResponseDTO> LoginUserAsync(LoginUserRequestDTO request)
         {
             var user = await _context.Users
                 .Include(u => u.Role)
@@ -62,7 +62,10 @@ namespace TS.ServiceLogic.Services
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
+            return new LoginUserResponseDTO()
+            {
+                Token = tokenHandler.WriteToken(token)
+            };
         }
 
         public async Task<CreateRoleResponseDTO> CreateRoleAsync(CreateRoleRequestDTO request)
@@ -128,7 +131,7 @@ namespace TS.ServiceLogic.Services
                 .ToListAsync();
         }
 
-        public async Task<string> DeleteUserAsync(DeleteUserRequestDTO request)
+        public async Task<DeleteUserResponseDTO> DeleteUserAsync(DeleteUserRequestDTO request)
         {
           
             TS.ServiceLogic.Common.Utility.ValidateAdminAndGetId(_httpContextAccessor.HttpContext?.User);
@@ -147,13 +150,18 @@ namespace TS.ServiceLogic.Services
                 t.Status != TS.Contract.Enums.TaskStatus.Completed);
 
             if (activeTasks)
-                return "User cannot be deleted because they still have active tasks.";
+                return new DeleteUserResponseDTO(){
+                    Message = "User cannot be deleted because they still have active tasks."
+                };
 
             user.IsDeleted = true;
 
             await _context.SaveChangesAsync();
 
-            return $"User '{user.Email}' deleted successfully.";
+            return new DeleteUserResponseDTO()
+            {
+                Message = $"User '{user.Email}' deleted successfully."
+            };
         }
     }
 }

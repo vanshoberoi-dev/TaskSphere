@@ -6,8 +6,8 @@ namespace TS.ServiceLogic.Interfaces
     {
         Task<string> RegisterUserAsync(RegisterUserRequestDTO request);
         Task<CreateRoleResponseDTO> CreateRoleAsync(CreateRoleRequestDTO request);
-        Task<string> LoginUserAsync(LoginUserRequestDTO request);
+        Task<LoginUserResponseDTO> LoginUserAsync(LoginUserRequestDTO request);
         Task<ICollection<GetUsersResponseDTO>> GetUsersAsync();
-        Task<string> DeleteUserAsync(DeleteUserRequestDTO request);
+        Task<DeleteUserResponseDTO> DeleteUserAsync(DeleteUserRequestDTO request);
     }
 }

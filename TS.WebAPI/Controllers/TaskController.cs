@@ -101,7 +101,7 @@ namespace TS.WebAPI.Controllers
             }
             catch (UnauthorizedAccessException ex)
             {
-                return Forbid(); // 403 (not creator)
+                return Forbid(); // 403
             }
             catch (NotFoundException ex)
             {
