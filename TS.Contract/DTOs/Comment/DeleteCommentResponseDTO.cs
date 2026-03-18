@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TS.Contract.DTOs.Comment
+﻿namespace TS.Contract.DTOs.Comment
 {
     public class DeleteCommentResponseDTO
     {
