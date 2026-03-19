@@ -9,8 +9,12 @@ TaskSphere is a lightweight, team-focused ticket manager built on .NET 8.
 - Role Based Functionalities (Admin/User)
 - Swagger Documentation
 
+## Supplimentary Features
+- Request Logging + Query Logging
+- SEQ Integration for structured logging
+
 
 ## Quick start
 1. Clone repo
-2. `dotnet run` (from project folder)
-3. Open http://localhost:5000
+2. `dotnet run` (from project folder i.e. TS.WebAPI)
+3. Open https://localhost:7206/swagger/index.html

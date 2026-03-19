@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -32,13 +33,22 @@ namespace TS.ServiceLogic.Services
         public async Task<LoginUserResponseDTO> LoginUserAsync(LoginUserRequestDTO request)
         {
             var user = await _context.Users
-                .Include(u => u.Role)
-                .FirstOrDefaultAsync(u => u.Email == request.Email);
+                .AsNoTracking()
+                .Where(u => u.Id == request.Id)
+                .Select(u => new {
+                    u.Id,
+                    u.PasswordHash,
+                    RoleName = u.Role.Role
+                })
+                .FirstOrDefaultAsync();
 
+            //var sw = Stopwatch.StartNew();
             if (user == null || !Argon2.Verify(user.PasswordHash, request.Password))
             {
                 throw new UnauthorizedAccessException("Invalid credentials");
             }
+            //sw.Stop(); // only keep in development
+            //System.Diagnostics.Debug.WriteLine($"Argon2 verification for User {user.Id} took {sw.ElapsedMilliseconds}ms");
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_configuration["JwtSettings:Key"]!);
@@ -46,8 +56,7 @@ namespace TS.ServiceLogic.Services
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, user.Role.Role)
+                new Claim(ClaimTypes.Role, user.RoleName)
             };
 
             var tokenDescriptor = new SecurityTokenDescriptor
